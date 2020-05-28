@@ -83,7 +83,7 @@ async function messageUpdate(oldMsg, newMsg) {
 
     const guildSettings = client.guildSettings.get(newMsg.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) && !newMsg.author.bot) {
+    if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) && !newMsg.author.bot && oldMsg.content !== newMsg.content) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Message Edited", newMsg.author.displayAvatarURL());
