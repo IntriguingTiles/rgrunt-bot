@@ -32,6 +32,10 @@ client.on("ready", () => {
     client.loadCommands();
     client.loadEvents();
     client.user.setActivity(`${defaultSettings.prefix}help`);
+
+    client.guilds.cache.forEach(guild => {
+        client.guildSettings.ensure(guild.id, defaultSettings);
+    });
 });
 
 client.on("guildCreate", async guild => {
