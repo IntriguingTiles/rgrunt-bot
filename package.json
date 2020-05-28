@@ -1,0 +1,34 @@
+{
+  "name": "rgrunt-bot",
+  "version": "1.0.0",
+  "description": "Discord bot that mostly logs stuff",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IntriguingTiles/rgrunt-bot.git"
+  },
+  "author": "IntriguingTiles",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IntriguingTiles/rgrunt-bot/issues"
+  },
+  "homepage": "https://github.com/IntriguingTiles/rgrunt-bot#readme",
+  "dependencies": {
+    "better-sqlite3": "^7.0.1",
+    "bufferutil": "^4.0.1",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "enmap": "^5.2.4",
+    "erlpack": "github:discordapp/erlpack",
+    "express": "^4.17.1",
+    "moment": "^2.26.0",
+    "utf-8-validate": "^5.0.2",
+    "zlib-sync": "^0.1.6"
+  },
+  "devDependencies": {
+    "eslint": "^7.1.0"
+  }
+}
