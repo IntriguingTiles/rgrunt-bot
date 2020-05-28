@@ -107,7 +107,7 @@ async function guildMemberUpdate(oldMember, newMember) {
             const logs = await newMember.guild.fetchAuditLogs({ limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newMember.id && logs.entries.first().executor.id !== newMember.id) {
                 const log = logs.entries.first();
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
                 }
@@ -137,7 +137,7 @@ async function guildMemberRemove(member) {
         if (guildSettings.logFlags & flags.logs.KICK && kickLogs.entries.first() && kickLogs.entries.first().target.id === member.id) {
             const log = kickLogs.entries.first();
 
-            if (log.createdTimestamp - Date.now() < 800) {
+            if (Date.now() - log.createdTimestamp < 800) {
                 const embed = new MessageEmbed();
 
                 embed.setAuthor("Member Kicked", member.user.displayAvatarURL());
@@ -159,7 +159,7 @@ async function guildMemberRemove(member) {
         if (guildSettings.logFlags & flags.logs.BAN && banLogs.entries.first() && banLogs.entries.first().target.id === member.id) {
             const log = banLogs.entries.first();
 
-            if (log.createdTimestamp - Date.now() < 800) {
+            if (Date.now() - log.createdTimestamp < 800) {
                 const embed = new MessageEmbed();
 
                 embed.setAuthor("Member Banned", member.user.displayAvatarURL());
@@ -239,7 +239,7 @@ async function guildBanRemove(guild, user) {
             const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_REMOVE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Unbanned by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
                 }

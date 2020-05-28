@@ -47,7 +47,7 @@ async function roleCreate(role) {
             if (logs.entries.first() && logs.entries.first().target.id === role.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -109,7 +109,7 @@ async function roleUpdate(oldRole, newRole) {
             const logs = await newRole.guild.fetchAuditLogs({ type: "ROLE_UPDATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newRole.id) {
                 const log = logs.entries.first();
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Changed by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -142,7 +142,7 @@ async function roleDelete(role) {
             if (logs.entries.first() && logs.entries.first().target.id === role.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);

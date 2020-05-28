@@ -47,7 +47,7 @@ async function emojiCreate(emoji) {
             if (logs.entries.first() && logs.entries.first().target.id === emoji.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -84,7 +84,7 @@ async function emojiUpdate(oldEmoji, newEmoji) {
             if (logs.entries.first() && logs.entries.first().target.id === newEmoji.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -118,7 +118,7 @@ async function emojiDelete(emoji) {
             if (logs.entries.first() && logs.entries.first().target.id === emoji.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);

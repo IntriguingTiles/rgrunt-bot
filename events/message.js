@@ -59,7 +59,7 @@ async function messageDelete(msg) {
             const logs = await msg.guild.fetchAuditLogs({ type: "MESSAGE_DELETE", limit: 1 });
             if (logs.entries.first()) {
                 const log = logs.entries.first();
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);

@@ -53,7 +53,7 @@ async function guildUpdate(oldGuild, newGuild) {
             const logs = await newGuild.fetchAuditLogs({ type: "GUILD_UPDATE", limit: 1 });
             if (logs.entries.first()) {
                 const log = logs.entries.first();
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
                 }

@@ -47,7 +47,7 @@ async function channelCreate(ch) {
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -95,7 +95,7 @@ async function channelUpdate(oldCh, newCh) {
             if (logs.entries.first() && logs.entries.first().target.id === newCh.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -129,7 +129,7 @@ async function channelDelete(ch) {
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
-                if (log.createdTimestamp - Date.now() < 800) {
+                if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
