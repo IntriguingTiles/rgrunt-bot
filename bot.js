@@ -51,15 +51,14 @@ client.on("message", async msg => {
     if (msg.channel.type === "dm") return;
     if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
 
-    const cmd = msg.content.slice(defaultSettings.prefix.length).split(" ")[0];
+    const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
+    const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
     
     if (!(cmd in client.commands)) return;
 
     if (client.commands[cmd].help && client.commands[cmd].help.requireAdmin) {
         if (!msg.member.hasPermission("MANAGE_GUILD") && msg.author.id !== "221017760111656961") return;
     }
-
-    const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
 
     if (client.commands[cmd].help && client.commands[cmd].help) {
         if (!msg.member.hasPermission("MANAGE_GUILD") && msg.author.id !== "221017760111656961") {
