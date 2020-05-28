@@ -114,7 +114,7 @@ async function guildMemberUpdate(oldMember, newMember) {
             }
         }
 
-        embed.setFooter(newMember.id);
+        embed.setFooter(`ID: ${newMember.id}`);
         embed.setTimestamp();
         newMember.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
