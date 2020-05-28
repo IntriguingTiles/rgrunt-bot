@@ -88,7 +88,7 @@ async function messageUpdate(oldMsg, newMsg) {
 
         embed.setAuthor("Message Edited", newMsg.author.displayAvatarURL());
         embed.setDescription(`[Jump to Message](${newMsg.url})`);
-        embed.setColor(0xFF470F);
+        embed.setColor(0x337FD5);
 
         embed.addField("Author", `${newMsg.author} ${newMsg.author.tag}`, true);
         embed.addField("Channel", `${newMsg.channel}`, true);
