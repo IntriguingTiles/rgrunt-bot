@@ -1,6 +1,7 @@
 const { Client, MessageEmbed, Guild } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
+const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
 /** @type {Client} */
@@ -34,7 +35,7 @@ async function guildUpdate(oldGuild, newGuild) {
         let shouldPost = false;
 
         embed.setAuthor("Server Updated", newGuild.iconURL());
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.BLUE);
 
         if (oldGuild.name !== newGuild.name) {
             embed.addField("Name", `\`${oldGuild.name}\` → \`${newGuild.name}\``);

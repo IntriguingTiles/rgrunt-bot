@@ -1,6 +1,7 @@
 const { Client, MessageEmbed, GuildChannel } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
+const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
 /** @type {Client} */
@@ -36,7 +37,7 @@ async function channelCreate(ch) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Channel Created", ch.guild.iconURL());
-        embed.setColor(0x43B581);
+        embed.setColor(colors.GREEN);
         embed.addField("Name", ch.name, true);
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();
@@ -72,7 +73,7 @@ async function channelUpdate(oldCh, newCh) {
         let shouldPost = false;
 
         embed.setAuthor("Channel Updated", newCh.guild.iconURL());
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.BLUE);
 
         if (oldCh.name !== newCh.name) {
             embed.addField("Name", `\`${oldCh.name}\` → \`${newCh.name}\``, true);
@@ -118,7 +119,7 @@ async function channelDelete(ch) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Channel Deleted", ch.guild.iconURL());
-        embed.setColor(0xFF470F);
+        embed.setColor(colors.RED);
         embed.addField("Name", ch.name, true);
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();

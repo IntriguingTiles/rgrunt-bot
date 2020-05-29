@@ -1,6 +1,7 @@
 const { Client, MessageEmbed, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
+const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
 /** @type {Client} */
@@ -35,7 +36,7 @@ async function messageDelete(msg) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Message Deleted", msg.author.displayAvatarURL());
-        embed.setColor(0xFF470F);
+        embed.setColor(colors.RED);
 
         embed.addField("Author", `${msg.author} ${msg.author.tag}`, true);
         embed.addField("Channel", `${msg.channel}`, true);
@@ -88,7 +89,7 @@ async function messageUpdate(oldMsg, newMsg) {
 
         embed.setAuthor("Message Edited", newMsg.author.displayAvatarURL());
         embed.setDescription(`[Jump to Message](${newMsg.url})`);
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.BLUE);
 
         embed.addField("Author", `${newMsg.author} ${newMsg.author.tag}`, true);
         embed.addField("Channel", `${newMsg.channel}`, true);

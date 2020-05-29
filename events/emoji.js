@@ -1,6 +1,7 @@
 const { Client, MessageEmbed, GuildEmoji } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
+const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
 /** @type {Client} */
@@ -35,7 +36,7 @@ async function emojiCreate(emoji) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Emoji Created", emoji.guild.iconURL());
-        embed.setColor(0x43B581);
+        embed.setColor(colors.GREEN);
         embed.addField("Name", emoji.name, true);
         embed.setThumbnail(emoji.url);
         embed.setFooter(`ID: ${emoji.id}`);
@@ -72,7 +73,7 @@ async function emojiUpdate(oldEmoji, newEmoji) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Emoji Updated", newEmoji.guild.iconURL());
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.BLUE);
         embed.addField("Name", `\`${oldEmoji.name}\` → \`${newEmoji.name}\``, true);
         embed.setThumbnail(newEmoji.url);
         embed.setFooter(`ID: ${newEmoji.id}`);
@@ -106,7 +107,7 @@ async function emojiDelete(emoji) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Emoji Deleted", emoji.guild.iconURL());
-        embed.setColor(0xFF470F);
+        embed.setColor(colors.RED);
         embed.addField("Name", emoji.name, true);
         embed.setThumbnail(emoji.url);
         embed.setFooter(`ID: ${emoji.id}`);

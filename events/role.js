@@ -1,6 +1,7 @@
 const { Client, Role, MessageEmbed } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
+const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
 /** @type {Client} */
@@ -35,7 +36,7 @@ async function roleCreate(role) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Role Created", role.guild.iconURL());
-        embed.setColor(0x43B581);
+        embed.setColor(colors.GREEN);
         embed.addField("Name", role.name, true);
         embed.addField("Permissions", `\`${role.permissions.bitfield}\``, true);
         embed.setFooter(`ID: ${role.id}`);
@@ -71,7 +72,7 @@ async function roleUpdate(oldRole, newRole) {
         let shouldPost = false;
 
         embed.setAuthor("Role Updated", newRole.guild.iconURL());
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.BLUE);
 
         if (oldRole.name !== newRole.name) {
             embed.addField("Name", `\`${oldRole.name}\` → \`${newRole.name}\``, true);
@@ -131,7 +132,7 @@ async function roleDelete(role) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Role Deleted", role.guild.iconURL());
-        embed.setColor(0xFF470F);
+        embed.setColor(colors.RED);
         embed.addField("Name", role.name, true);
         embed.setFooter(`ID: ${role.id}`);
         embed.setTimestamp();

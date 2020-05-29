@@ -1,6 +1,7 @@
 const { Client, GuildMember, MessageEmbed, Guild, User } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
+const colors = require("../utils/colors.js");
 const moment = require("moment");
 const sleep = require("util").promisify(setTimeout);
 
@@ -46,7 +47,7 @@ async function guildMemberAdd(member) {
         }
 
         embed.setThumbnail(member.user.displayAvatarURL());
-        embed.setColor(0x43B581);
+        embed.setColor(colors.GREEN);
         embed.setDescription(`${member.user} ${member.user.tag}`);
         embed.setFooter(`ID: ${member.id}`);
         embed.setTimestamp();
@@ -69,7 +70,7 @@ async function guildMemberUpdate(oldMember, newMember) {
         let shouldPost = false;
 
         embed.setAuthor("Member Updated", newMember.user.displayAvatarURL());
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.BLUE);
         embed.addField("Member", `${newMember.user} ${newMember.user.tag}`);
 
         if (oldMember.nickname !== newMember.nickname) {
@@ -141,7 +142,7 @@ async function guildMemberRemove(member) {
 
                 embed.setAuthor("Member Kicked", member.user.displayAvatarURL());
                 embed.setThumbnail(member.user.displayAvatarURL());
-                embed.setColor(0xFF470F);
+                embed.setColor(colors.RED);
 
                 embed.addField("Member", `${member.user} ${member.user.tag}`, true);
                 embed.addField("Kicked by", `${log.executor} ${log.executor.tag}`, true);
@@ -161,7 +162,7 @@ async function guildMemberRemove(member) {
 
         embed.setAuthor("Member Left", member.user.displayAvatarURL());
         embed.setThumbnail(member.user.displayAvatarURL());
-        embed.setColor(0xFF470F);
+        embed.setColor(colors.RED);
         embed.setDescription(`${member.user} ${member.user.tag}`);
         embed.setFooter(`ID: ${member.id}`);
         embed.setTimestamp();
@@ -184,7 +185,7 @@ async function guildBanAdd(guild, user) {
 
         embed.setAuthor("Member Banned", user.displayAvatarURL());
         embed.setThumbnail(user.displayAvatarURL());
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.RED);
         embed.addField("Member", `${user} ${user.tag}`, true);
 
 
@@ -221,7 +222,7 @@ async function guildBanRemove(guild, user) {
 
         embed.setAuthor("Member Unbanned", user.displayAvatarURL());
         embed.setThumbnail(user.displayAvatarURL());
-        embed.setColor(0x337FD5);
+        embed.setColor(colors.GREEN);
         embed.addField("Member", `${user} ${user.tag}`, true);
 
 
