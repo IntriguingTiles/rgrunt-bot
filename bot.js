@@ -11,7 +11,7 @@ client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetch
 client.login(process.env.TOKEN);
 
 const defaultSettings = {
-    prefix: "r!",
+    prefix: "!",
     logChannel: null,
     verifyRole: null,
     jailRole: null,
