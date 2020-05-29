@@ -1,5 +1,7 @@
 const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
 
+exports.aliases = ["unjail"];
+
 exports.help = {
     name: "jail",
     usage: "jail <@mention or id>",

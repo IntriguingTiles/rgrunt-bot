@@ -95,10 +95,16 @@ client.loadCommands = () => {
     const commands = fs.readdirSync("./commands/");
     client.commands = {};
     for (let i = 0; i < commands.length; i++) {
-        const cmd = commands[i];
+        let cmd = commands[i];
         if (cmd.match(/\.js$/)) {
             delete require.cache[require.resolve(`./commands/${cmd}`)];
             client.commands[cmd.slice(0, -3)] = require(`./commands/${cmd}`);
+            cmd = client.commands[cmd.slice(0, -3)];
+            if (cmd.aliases) {
+                for (let j = 0; j < cmd.aliases.length; j++) {
+                    client.commands[cmd.aliases[j]] = cmd;
+                }
+            }
         }
     }
     console.log(`Loaded ${commands.length} commands!`);
