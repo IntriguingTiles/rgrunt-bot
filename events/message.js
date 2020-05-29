@@ -33,6 +33,8 @@ async function messageDelete(msg) {
     const guildSettings = client.guildSettings.get(msg.guild.id);
 
     if (guildSettings.logFlags & flags.logs.DELETE && guildSettings.logChannel && msg.guild.channels.cache.has(guildSettings.logChannel) && !msg.author.bot) {
+        if (msg.channel.topic && msg.channel.topic.includes("[NO-LOGS]")) return;
+
         const embed = new MessageEmbed();
 
         embed.setAuthor("Message Deleted", msg.author.displayAvatarURL());
@@ -85,6 +87,7 @@ async function messageUpdate(oldMsg, newMsg) {
     const guildSettings = client.guildSettings.get(newMsg.guild.id);
 
     if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) && !newMsg.author.bot && oldMsg.content !== newMsg.content) {
+        if (newMsg.channel.topic && newMsg.channel.topic.includes("[NO-LOGS]")) return;
         const embed = new MessageEmbed();
 
         embed.setAuthor("Message Edited", newMsg.author.displayAvatarURL());

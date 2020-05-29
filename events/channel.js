@@ -69,6 +69,7 @@ async function channelUpdate(oldCh, newCh) {
     const guildSettings = client.guildSettings.get(newCh.guild.id);
 
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && newCh.guild.channels.cache.has(guildSettings.logChannel)) {
+        if (newCh.topic && newCh.topic.includes("[NO-LOGS]")) return;
         const embed = new MessageEmbed();
         let shouldPost = false;
 
@@ -82,7 +83,7 @@ async function channelUpdate(oldCh, newCh) {
             embed.addField("Name", newCh.name, true);
         }
 
-        if ((newCh.type === "text" || newCh.type === "news") && oldCh.topic !== newCh.topic) {
+        if (oldCh.topic !== newCh.topic) {
             embed.addField("Topic", `${oldCh.topic ? `\`${oldCh.topic}\`` : "None"} → ${newCh.topic ? `\`${newCh.topic}\`` : "None"}`, true);
             shouldPost = true;
         }
