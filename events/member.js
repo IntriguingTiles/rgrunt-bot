@@ -41,7 +41,7 @@ async function guildMemberAdd(member) {
 
         embed.setAuthor("Member Joined", member.user.displayAvatarURL());
 
-        if (moment.duration(moment().diff(member.user.createdTimestamp)).months() < 1) {
+        if (moment.duration(moment().diff(member.user.createdTimestamp)).months() < 1 && moment.duration(moment().diff(member.user.createdTimestamp)).years() === 0) {
             embed.addField("New Account", `Created ${moment(member.user.createdTimestamp).fromNow()}`);
         }
 
