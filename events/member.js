@@ -132,7 +132,6 @@ async function guildMemberRemove(member) {
         await sleep(500);
 
         const kickLogs = await member.guild.fetchAuditLogs({ type: "MEMBER_KICK" });
-        const banLogs = await member.guild.fetchAuditLogs({ type: "MEMBER_BAN_ADD" });
 
         if (guildSettings.logFlags & flags.logs.KICK && kickLogs.entries.first() && kickLogs.entries.first().target.id === member.id) {
             const log = kickLogs.entries.first();
@@ -146,28 +145,6 @@ async function guildMemberRemove(member) {
 
                 embed.addField("Member", `${member.user} ${member.user.tag}`, true);
                 embed.addField("Kicked by", `${log.executor} ${log.executor.tag}`, true);
-                if (log.reason) embed.addField("Reason", log.reason);
-
-                embed.setFooter(`ID: ${member.id}`);
-                embed.setTimestamp(log.createdAt);
-
-                member.guild.channels.cache.get(guildSettings.logChannel).send(embed);
-                return;
-            }
-        }
-
-        if (guildSettings.logFlags & flags.logs.BAN && banLogs.entries.first() && banLogs.entries.first().target.id === member.id) {
-            const log = banLogs.entries.first();
-
-            if (Date.now() - log.createdTimestamp < 800) {
-                const embed = new MessageEmbed();
-
-                embed.setAuthor("Member Banned", member.user.displayAvatarURL());
-                embed.setThumbnail(member.user.displayAvatarURL());
-                embed.setColor(0xFF470F);
-
-                embed.addField("Member", `${member.user} ${member.user.tag}`, true);
-                embed.addField("Banned by", `${log.executor} ${log.executor.tag}`, true);
                 if (log.reason) embed.addField("Reason", log.reason);
 
                 embed.setFooter(`ID: ${member.id}`);
@@ -200,20 +177,34 @@ async function guildMemberRemove(member) {
 async function guildBanAdd(guild, user) {
     const guildSettings = client.guildSettings.get(guild.id);
 
-    if (guildSettings.logFlags & flags.logs.BAN && guildSettings.logChannel && !guild.me.hasPermission("VIEW_AUDIT_LOG") && guild.channels.cache.has(guildSettings.logChannel)) {
-        // guild wants us to log bans but doesn't let us view audit logs
+    if (guildSettings.logFlags & flags.logs.BAN && guildSettings.logChannel && guild.channels.cache.has(guildSettings.logChannel)) {
+        await user.fetch();
+
         const embed = new MessageEmbed();
 
         embed.setAuthor("Member Banned", user.displayAvatarURL());
         embed.setThumbnail(user.displayAvatarURL());
-        embed.setColor(0xFF470F);
-        embed.setDescription(`${user} ${user.tag}`);
+        embed.setColor(0x337FD5);
+        embed.addField("Member", `${user} ${user.tag}`, true);
+
+
+        if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+            await sleep(600);
+            const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_ADD", limit: 1 });
+            if (logs.entries.first() && logs.entries.first().target.id === user.id) {
+                const log = logs.entries.first();
+                if (Date.now() - log.createdTimestamp < 900) {
+                    embed.addField("Banned by", `${log.executor} ${log.executor.tag}`, true);
+                    if (log.reason) embed.addField("Reason", log.reason);
+                }
+            }
+        }
+
         embed.setFooter(`ID: ${user.id}`);
         embed.setTimestamp();
 
         guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
-
 }
 
 /**
