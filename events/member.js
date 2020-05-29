@@ -189,11 +189,11 @@ async function guildBanAdd(guild, user) {
 
 
         if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(600);
+            await sleep(800);
             const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_ADD", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 900) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Banned by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
                 }
