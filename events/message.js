@@ -32,7 +32,7 @@ async function messageDelete(msg) {
 
     const guildSettings = client.guildSettings.get(msg.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.DELETE && guildSettings.logChannel && msg.guild.channels.cache.has(guildSettings.logChannel) && !msg.author.bot) {
+    if (guildSettings.logFlags & flags.logs.DELETE && guildSettings.logChannel && msg.guild.channels.cache.has(guildSettings.logChannel)) {
         if (msg.channel.topic && msg.channel.topic.includes("[NO-LOGS]")) return;
 
         const embed = new MessageEmbed();
@@ -44,6 +44,7 @@ async function messageDelete(msg) {
         embed.addField("Channel", `${msg.channel}`, true);
 
         if (!msg.partial) {
+            if (msg.author.bot) return;
             if (msg.content.length !== 0) embed.addField("Contents", cutOff(msg.content, 300, 8));
 
             if (msg.attachments.size !== 0) {
