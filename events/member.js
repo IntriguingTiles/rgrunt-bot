@@ -154,7 +154,7 @@ async function guildMemberKick(member) {
         await member.user.fetch();
 
         const embed = new MessageEmbed();
-        const logs = await member.guild.fetchAuditLogs({ type: "MEMBER_KICK_ADD", limit: 1 });
+        const logs = await member.guild.fetchAuditLogs({ type: "MEMBER_KICK", limit: 1 });
 
         embed.setAuthor("Member Kicked", member.user.displayAvatarURL());
         embed.setThumbnail(member.user.displayAvatarURL());
