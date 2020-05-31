@@ -37,14 +37,16 @@ async function messageDelete(msg) {
 
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Message Deleted", msg.author.displayAvatarURL());
+        embed.setAuthor("Message Deleted");
         embed.setColor(colors.RED);
-
-        embed.addField("Author", `${msg.author} ${msg.author.tag}`, true);
-        embed.addField("Channel", `${msg.channel}`, true);
 
         if (!msg.partial) {
             if (msg.author.bot) return;
+
+            embed.setAuthor("Message Deleted", msg.author.displayAvatarURL());
+            embed.addField("Author", `${msg.author} ${msg.author.tag}`, true);
+            embed.addField("Channel", `${msg.channel}`, true);
+
             if (msg.content.length !== 0) embed.addField("Contents", cutOff(msg.content, 300, 8));
 
             if (msg.attachments.size !== 0) {
@@ -56,6 +58,8 @@ async function messageDelete(msg) {
 
                 embed.addField("Attachments", attachments);
             }
+        } else {
+            embed.addField("Channel", `${msg.channel}`, true);
         }
 
         if (msg.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
@@ -87,8 +91,10 @@ async function messageUpdate(oldMsg, newMsg) {
 
     const guildSettings = client.guildSettings.get(newMsg.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) && !newMsg.author.bot && oldMsg.content !== newMsg.content) {
+    if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) && oldMsg.content !== newMsg.content) {
         if (newMsg.channel.topic && newMsg.channel.topic.includes("[NO-LOGS]")) return;
+        if (newMsg.partial) await newMsg.fetch();
+        if (newMsg.author.bot) return;
         const embed = new MessageEmbed();
 
         embed.setAuthor("Message Edited", newMsg.author.displayAvatarURL());
