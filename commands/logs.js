@@ -75,6 +75,14 @@ exports.run = async (client, msg, args, guildSettings) => {
         }
         case "channel": {
             if (args.length !== 2) return msg.channel.send(`Usage: ${guildSettings.prefix}logs channel <channel>`, { code: "" });
+
+            if (args[1] === "clear") {
+                guildSettings.logChannel = null;
+                client.guildSettings.set(msg.guild.id, guildSettings);
+                msg.channel.send("Successfully cleared the logging channel");
+                return;
+            }
+
             let channelID;
 
             if (msg.mentions.channels.size !== 0) channelID = msg.mentions.channels.first().id;
