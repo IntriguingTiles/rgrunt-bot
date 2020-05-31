@@ -16,6 +16,7 @@ exports.register = c => {
     c.on("guildMemberAdd", guildMemberAdd);
     c.on("guildMemberUpdate", guildMemberUpdate);
     c.on("guildMemberRemove", guildMemberRemove);
+    c.on("guildMemberRemove", guildMemberKick);
     c.on("guildBanAdd", guildBanAdd);
     c.on("guildBanRemove", guildBanRemove);
 };
@@ -27,6 +28,7 @@ exports.deregister = c => {
     c.removeListener("guildMemberAdd", guildMemberAdd);
     c.removeListener("guildMemberUpdate", guildMemberUpdate);
     c.removeListener("guildMemberRemove", guildMemberRemove);
+    c.removeListener("guildMemberRemove", guildMemberKick);
     c.removeListener("guildBanAdd", guildBanAdd);
     c.removeListener("guildBanRemove", guildBanRemove);
 };
@@ -127,36 +129,6 @@ async function guildMemberUpdate(oldMember, newMember) {
 async function guildMemberRemove(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
-    if ((guildSettings.logFlags & flags.logs.KICK || guildSettings.logFlags & flags.logs.BAN)
-        && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)
-        && member.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-        await sleep(500);
-
-        const kickLogs = await member.guild.fetchAuditLogs({ type: "MEMBER_KICK" });
-
-        if (guildSettings.logFlags & flags.logs.KICK && kickLogs.entries.first() && kickLogs.entries.first().target.id === member.id) {
-            const log = kickLogs.entries.first();
-
-            if (Date.now() - log.createdTimestamp < 800) {
-                const embed = new MessageEmbed();
-
-                embed.setAuthor("Member Kicked", member.user.displayAvatarURL());
-                embed.setThumbnail(member.user.displayAvatarURL());
-                embed.setColor(colors.RED);
-
-                embed.addField("Member", `${member.user} ${member.user.tag}`, true);
-                embed.addField("Kicked by", `${log.executor} ${log.executor.tag}`, true);
-                if (log.reason) embed.addField("Reason", log.reason);
-
-                embed.setFooter(`ID: ${member.id}`);
-                embed.setTimestamp(log.createdAt);
-
-                member.guild.channels.cache.get(guildSettings.logChannel).send(embed);
-                return;
-            }
-        }
-    }
-
     if (guildSettings.logFlags & flags.logs.LEAVE && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
@@ -165,6 +137,39 @@ async function guildMemberRemove(member) {
         embed.setColor(colors.RED);
         embed.setDescription(`${member.user} ${member.user.tag}`);
         embed.setFooter(`ID: ${member.id}`);
+        embed.setTimestamp();
+
+        member.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+    }
+}
+
+/**
+ * @param {GuildMember} member 
+ */
+async function guildMemberKick(member) {
+    const guildSettings = client.guildSettings.get(member.guild.id);
+
+    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) && member.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        await sleep(800);
+        await member.user.fetch();
+
+        const embed = new MessageEmbed();
+        const logs = await member.guild.fetchAuditLogs({ type: "MEMBER_KICK_ADD", limit: 1 });
+
+        embed.setAuthor("Member Kicked", member.user.displayAvatarURL());
+        embed.setThumbnail(member.user.displayAvatarURL());
+        embed.setColor(colors.RED);
+        embed.addField("Member", `${member.user} ${member.user.tag}`, true);
+
+        if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Date.now() - logs.entries.first().createdAt < 1400) {
+            const log = logs.entries.first();
+            embed.addField("Kicked by", `${log.executor} ${log.executor.tag}`, true);
+            if (log.reason) embed.addField("Reason", log.reason);
+        } else {
+            return;
+        }
+
+        embed.setFooter(`ID: ${member.user.id}`);
         embed.setTimestamp();
 
         member.guild.channels.cache.get(guildSettings.logChannel).send(embed);
