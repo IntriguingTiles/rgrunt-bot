@@ -26,6 +26,7 @@ async function message(msg) {
     if (msg.author.bot) return;
     if (msg.content.length === 0) return;
     if (!msg.deletable) return;
+    if (msg.member.hasPermission("MANAGE_GUILD")) return;
 
     const badWords = client.badWords.get(msg.guild.id);
 
