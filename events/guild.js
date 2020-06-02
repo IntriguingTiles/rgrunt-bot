@@ -55,7 +55,7 @@ async function guildUpdate(oldGuild, newGuild) {
             if (logs.entries.first()) {
                 const log = logs.entries.first();
                 if (Date.now() - log.createdTimestamp < 800) {
-                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`, true);
+                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     if (log.reason) embed.addField("Reason", log.reason);
                 }
             }
