@@ -18,7 +18,7 @@ exports.run = async (client, msg, args, guildSettings) => {
 
     switch (args[0]) {
         case "add":
-            if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter add <word>`);
+            if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter add <word>`, { code: "" });
 
             guildSettings.badWords.push(args[1].toLowerCase());
             client.guildSettings.set(msg.guild.id, guildSettings);
@@ -27,7 +27,7 @@ exports.run = async (client, msg, args, guildSettings) => {
             msg.channel.send(`Successfully added \`${args[1]}\` to the word filter`);
             break;
         case "remove":
-            if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter remove <word>`);
+            if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter remove <word>`, { code: "" });
 
             if (!guildSettings.badWords.includes(args[1].toLowerCase())) return msg.channel.send("Word not found in filter");
 
