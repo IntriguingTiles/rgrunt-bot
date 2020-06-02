@@ -62,7 +62,10 @@ async function messageDelete(msg) {
             embed.addField("Channel", `${msg.channel}`, true);
         }
 
-        if (msg.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (msg.badWords) {
+            embed.addField("Deleted by", `${client.user} ${client.user.tag}`);
+            embed.addField("Reason", "Word filter");
+        } else if (msg.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(500);
             const logs = await msg.guild.fetchAuditLogs({ type: "MESSAGE_DELETE", limit: 1 });
             if (logs.entries.first()) {

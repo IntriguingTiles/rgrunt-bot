@@ -32,6 +32,9 @@ async function message(msg) {
     if (badWords.length === 0) return;
 
     badWords.forEach(word => {
-        if (msg.content.match(word)) msg.delete({ reason: "Word filter" });
+        if (msg.content.match(word)) {
+            msg.delete();
+            msg.badWords = true;
+        }
     });
 }
