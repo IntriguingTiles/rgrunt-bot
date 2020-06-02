@@ -3,11 +3,13 @@ const Discord = require("discord.js");
 const Enmap = require("enmap");
 const express = require("express");
 const fs = require("fs");
+const lookalikes = require("./utils/lookalikes.js");
 
 const server = express();
 
 const client = new Discord.Client({ disableMentions: "everyone", partials: ["MESSAGE"] });
-client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: false });
+client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: false, ensureProps: true });
+client.badWords = new Discord.Collection();
 client.login(process.env.TOKEN);
 
 const defaultSettings = {
@@ -16,7 +18,8 @@ const defaultSettings = {
     verifyRole: null,
     jailRole: null,
     modRoles: [],
-    logFlags: 0
+    logFlags: 0,
+    badWords: []
 };
 
 process.on("unhandledRejection", err => {
@@ -34,7 +37,7 @@ client.on("ready", () => {
     client.user.setActivity(`${defaultSettings.prefix}help`);
 
     client.guilds.cache.forEach(guild => {
-        client.guildSettings.ensure(guild.id, defaultSettings);
+        client.regenRegex(guild.id);
     });
 });
 
@@ -53,7 +56,7 @@ client.on("message", async msg => {
 
     const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
     const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
-    
+
     if (!(cmd in client.commands)) return;
 
     if (client.commands[cmd].help && client.commands[cmd].help.requireAdmin) {
@@ -122,6 +125,23 @@ client.loadEvents = () => {
         }
     }
     console.log(`Loaded ${events.length} events!`);
+};
+
+client.regenRegex = guildID => {
+    const guildSettings = client.guildSettings.ensure(guildID, defaultSettings);
+    client.badWords.set(guildID, []);
+
+    guildSettings.badWords.forEach(badWord => {
+        // this gets a bit wacky since lookalikes might change in between bot restarts
+        let regex = "";
+
+        for (let i = 0; i < badWord.length; i++) {
+            if (badWord.charAt(i) === "\\" || badWord.charAt(i) === "]" || badWord.charAt(i) === "-") continue;
+            regex += `[${lookalikes[badWord.toLowerCase().charAt(i)] ? lookalikes[badWord.toLowerCase().charAt(i)] : badWord.charAt(i)}]`;
+        }
+
+        client.badWords.get(guildID).push(new RegExp(regex, "i"));
+    });
 };
 
 // very ugly express inline html stuff below

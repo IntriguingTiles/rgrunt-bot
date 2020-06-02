@@ -106,11 +106,11 @@ async function guildMemberUpdate(oldMember, newMember) {
         if (!shouldPost) return;
 
         if (newMember.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
+            await sleep(800);
             const logs = await newMember.guild.fetchAuditLogs({ limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newMember.id && logs.entries.first().executor.id !== newMember.id) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 800) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
                 }
