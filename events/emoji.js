@@ -51,7 +51,7 @@ async function emojiCreate(emoji) {
                 if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason, true);
+                    if (log.reason) embed.addField("Reason", log.reason);
                 }
             }
         } else {
@@ -88,7 +88,7 @@ async function emojiUpdate(oldEmoji, newEmoji) {
                 if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason, true);
+                    if (log.reason) embed.addField("Reason", log.reason);
                 }
             }
         }
@@ -122,7 +122,7 @@ async function emojiDelete(emoji) {
                 if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason, true);
+                    if (log.reason) embed.addField("Reason", log.reason);
                 }
             }
         }

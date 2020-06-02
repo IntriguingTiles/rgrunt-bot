@@ -64,7 +64,7 @@ async function messageDelete(msg) {
 
         if (msg.badWords) {
             embed.addField("Deleted by", `${client.user} ${client.user.tag}`);
-            embed.addField("Reason", "Word filter", true);
+            embed.addField("Reason", "Word filter");
         } else if (msg.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(500);
             const logs = await msg.guild.fetchAuditLogs({ type: "MESSAGE_DELETE", limit: 1 });
@@ -73,7 +73,7 @@ async function messageDelete(msg) {
                 if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason, true);
+                    if (log.reason) embed.addField("Reason", log.reason);
                 }
             }
         }
