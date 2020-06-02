@@ -51,7 +51,7 @@ async function roleCreate(role) {
                 if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addField("Reason", log.reason, true);
                 }
             }
         }
@@ -113,7 +113,7 @@ async function roleUpdate(oldRole, newRole) {
                 if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Changed by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addField("Reason", log.reason, true);
                 }
             }
         }
@@ -146,7 +146,7 @@ async function roleDelete(role) {
                 if (Date.now() - log.createdTimestamp < 800) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addField("Reason", log.reason, true);
                 }
             }
         }
