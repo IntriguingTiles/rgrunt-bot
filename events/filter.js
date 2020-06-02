@@ -23,6 +23,7 @@ exports.deregister = c => {
  */
 async function message(msg) {
     if (msg.channel.type === "dm") return;
+    if (msg.author.bot) return;
     if (msg.content.length === 0) return;
     if (!msg.deletable) return;
 
