@@ -24,6 +24,7 @@ exports.deregister = c => {
  * @param {Message} msg 
  */
 async function message(msg) {
+    if (msg.partial) return;
     if (msg.channel.type === "dm") return;
     if (msg.author.bot) return;
     if (msg.content.length === 0) return;
@@ -47,6 +48,7 @@ async function message(msg) {
  * @param {Message} newMsg 
  */
 async function messageUpdate(oldMsg, newMsg) {
+    if (newMsg.partial) return;
     if (newMsg.channel.type === "dm") return;
     if (newMsg.author.bot) return;
     if (newMsg.content.length === 0) return;
