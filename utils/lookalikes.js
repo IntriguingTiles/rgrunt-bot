@@ -1,7 +1,7 @@
 module.exports = {
 a: "a",
 b: "b",
-c: "c",
+c: "cс",
 d: "d",
 e: "e",
 f: "f",
