@@ -42,7 +42,7 @@ async function roleCreate(role) {
         embed.setFooter(`ID: ${role.id}`);
         embed.setTimestamp();
 
-        const msg = role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (role.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
@@ -143,7 +143,7 @@ async function roleDelete(role) {
         embed.setFooter(`ID: ${role.id}`);
         embed.setTimestamp();
 
-        const msg = role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (role.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);

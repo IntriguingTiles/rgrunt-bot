@@ -108,7 +108,7 @@ async function guildMemberUpdate(oldMember, newMember) {
         embed.setFooter(`ID: ${newMember.id}`);
         embed.setTimestamp();
 
-        const msg = newMember.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await newMember.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (newMember.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
@@ -197,7 +197,7 @@ async function guildBanAdd(guild, user) {
         embed.setFooter(`ID: ${user.id}`);
         embed.setTimestamp();
 
-        const msg = guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
@@ -234,7 +234,7 @@ async function guildBanRemove(guild, user) {
         embed.setFooter(`ID: ${user.id}`);
         embed.setTimestamp();
 
-        const msg = guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);

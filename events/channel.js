@@ -42,7 +42,7 @@ async function channelCreate(ch) {
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();
 
-        const msg = ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (ch.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
@@ -95,7 +95,7 @@ async function channelUpdate(oldCh, newCh) {
         embed.setFooter(`ID: ${newCh.id}`);
         embed.setTimestamp();
 
-        const msg = newCh.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await newCh.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (newCh.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
@@ -131,7 +131,7 @@ async function channelDelete(ch) {
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();
 
-        const msg = ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (ch.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);

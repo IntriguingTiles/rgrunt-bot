@@ -52,7 +52,7 @@ async function guildUpdate(oldGuild, newGuild) {
         embed.setFooter(`ID: ${newGuild.id}`);
         embed.setTimestamp();
 
-        const msg = newGuild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await newGuild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (newGuild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);

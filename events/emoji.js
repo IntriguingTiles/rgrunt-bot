@@ -44,7 +44,7 @@ async function emojiCreate(emoji) {
 
         if (!emoji.guild.me.hasPermission("VIEW_AUDIT_LOG")) embed.addField("Created by", `${await emoji.fetchAuthor()} ${await emoji.fetchAuthor().tag}`);
 
-        const msg = emoji.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await emoji.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (emoji.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
