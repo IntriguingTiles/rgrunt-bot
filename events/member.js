@@ -104,6 +104,11 @@ async function guildMemberUpdate(oldMember, newMember) {
         }
 
         if (!shouldPost) return;
+        
+        embed.setFooter(`ID: ${newMember.id}`);
+        embed.setTimestamp();
+
+        const msg = newMember.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (newMember.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
@@ -113,13 +118,10 @@ async function guildMemberUpdate(oldMember, newMember) {
                 if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
-
-        embed.setFooter(`ID: ${newMember.id}`);
-        embed.setTimestamp();
-        newMember.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }
 
@@ -192,7 +194,10 @@ async function guildBanAdd(guild, user) {
         embed.setThumbnail(user.displayAvatarURL());
         embed.setColor(colors.RED);
         embed.addField("Member", `${user} ${user.tag}`, true);
+        embed.setFooter(`ID: ${user.id}`);
+        embed.setTimestamp();
 
+        const msg = guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
@@ -202,14 +207,10 @@ async function guildBanAdd(guild, user) {
                 if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Banned by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
-
-        embed.setFooter(`ID: ${user.id}`);
-        embed.setTimestamp();
-
-        guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }
 
@@ -230,22 +231,22 @@ async function guildBanRemove(guild, user) {
         embed.setColor(colors.GREEN);
         embed.addField("Member", `${user} ${user.tag}`, true);
 
-
-        if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
-            const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_REMOVE", limit: 1 });
-            if (logs.entries.first() && logs.entries.first().target.id === user.id) {
-                const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 800) {
-                    embed.addField("Unbanned by", `${log.executor} ${log.executor.tag}`, true);
-                    if (log.reason) embed.addField("Reason", log.reason);
-                }
-            }
-        }
-
         embed.setFooter(`ID: ${user.id}`);
         embed.setTimestamp();
 
-        guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = guild.channels.cache.get(guildSettings.logChannel).send(embed);
+
+        if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+            await sleep(800);
+            const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_REMOVE", limit: 1 });
+            if (logs.entries.first() && logs.entries.first().target.id === user.id) {
+                const log = logs.entries.first();
+                if (Date.now() - log.createdTimestamp < 1400) {
+                    embed.addField("Unbanned by", `${log.executor} ${log.executor.tag}`, true);
+                    if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
+                }
+            }
+        }
     }
 }

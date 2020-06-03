@@ -49,21 +49,22 @@ async function guildUpdate(oldGuild, newGuild) {
 
         if (!shouldPost) return;
 
-        if (newGuild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
-            const logs = await newGuild.fetchAuditLogs({ type: "GUILD_UPDATE", limit: 1 });
-            if (logs.entries.first()) {
-                const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 800) {
-                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
-                    if (log.reason) embed.addField("Reason", log.reason);
-                }
-            }
-        }
-
         embed.setFooter(`ID: ${newGuild.id}`);
         embed.setTimestamp();
 
-        newGuild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = newGuild.channels.cache.get(guildSettings.logChannel).send(embed);
+
+        if (newGuild.me.hasPermission("VIEW_AUDIT_LOG")) {
+            await sleep(800);
+            const logs = await newGuild.fetchAuditLogs({ type: "GUILD_UPDATE", limit: 1 });
+            if (logs.entries.first()) {
+                const log = logs.entries.first();
+                if (Date.now() - log.createdTimestamp < 1400) {
+                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
+                    if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
+                }
+            }
+        }
     }
 }

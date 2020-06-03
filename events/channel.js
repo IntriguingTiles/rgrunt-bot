@@ -42,21 +42,23 @@ async function channelCreate(ch) {
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();
 
+        const msg = ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+
         if (ch.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
+            await sleep(800);
             const logs = await ch.guild.fetchAuditLogs({ type: "CHANNEL_CREATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 800) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
 
-        ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }
 
@@ -88,24 +90,28 @@ async function channelUpdate(oldCh, newCh) {
             shouldPost = true;
         }
 
+        if (!shouldPost) return;
+
         embed.setFooter(`ID: ${newCh.id}`);
         embed.setTimestamp();
 
+        const msg = newCh.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+
         if (newCh.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
+            await sleep(800);
             const logs = await newCh.guild.fetchAuditLogs({ type: "CHANNEL_UPDATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newCh.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 800) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
 
-        if (shouldPost) newCh.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }
 
@@ -125,20 +131,22 @@ async function channelDelete(ch) {
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();
 
+        const msg = ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+
         if (ch.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
+            await sleep(800);
             const logs = await ch.guild.fetchAuditLogs({ type: "CHANNEL_DELETE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 800) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
 
-        ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }

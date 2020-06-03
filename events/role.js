@@ -42,21 +42,23 @@ async function roleCreate(role) {
         embed.setFooter(`ID: ${role.id}`);
         embed.setTimestamp();
 
+        const msg = role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+
         if (role.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
+            await sleep(800);
             const logs = await role.guild.fetchAuditLogs({ type: "ROLE_CREATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === role.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 800) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
 
-        role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }
 
@@ -102,23 +104,27 @@ async function roleUpdate(oldRole, newRole) {
             shouldPost = true;
         }
 
+        if (!shouldPost) return;
+
         embed.setFooter(`ID: ${newRole.id}`);
         embed.setTimestamp();
 
+        const msg =newRole.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+
         if (newRole.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
+            await sleep(800);
             const logs = await newRole.guild.fetchAuditLogs({ type: "ROLE_UPDATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newRole.id) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 800) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Changed by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
 
-        if (shouldPost) newRole.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }
 
@@ -137,20 +143,22 @@ async function roleDelete(role) {
         embed.setFooter(`ID: ${role.id}`);
         embed.setTimestamp();
 
+        const msg = role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+
         if (role.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(500);
+            await sleep(800);
             const logs = await role.guild.fetchAuditLogs({ type: "ROLE_DELETE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === role.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 800) {
+                if (Date.now() - log.createdTimestamp < 1400) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
+                    msg.edit(embed);
                 }
             }
         }
 
-        role.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
 }
