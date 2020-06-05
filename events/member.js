@@ -116,7 +116,7 @@ async function guildMemberUpdate(oldMember, newMember) {
             if (logs.entries.first() && logs.entries.first().target.id === newMember.id && logs.entries.first().executor.id !== newMember.id) {
                 const log = logs.entries.first();
                 if (Date.now() - log.createdTimestamp < 1400) {
-                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`, true);
+                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     if (log.reason) embed.addField("Reason", log.reason);
                     msg.edit(embed);
                 }
