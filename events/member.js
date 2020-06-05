@@ -135,6 +135,9 @@ async function guildMemberRemove(member) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Member Left", member.user.displayAvatarURL());
+
+        embed.addField("Member For", moment(member.joinedTimestamp).fromNow(true));
+
         embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.RED);
         embed.setDescription(`${member.user} ${member.user.tag}`);
@@ -152,7 +155,7 @@ async function guildMemberKick(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
     if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) && member.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-        await sleep(800);
+        await sleep(900);
         await member.user.fetch();
 
         const embed = new MessageEmbed();
@@ -163,7 +166,7 @@ async function guildMemberKick(member) {
         embed.setColor(colors.RED);
         embed.addField("Member", `${member.user} ${member.user.tag}`, true);
 
-        if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Date.now() - logs.entries.first().createdAt < 1400) {
+        if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Date.now() - logs.entries.first().createdAt < 1500) {
             const log = logs.entries.first();
             embed.addField("Kicked by", `${log.executor} ${log.executor.tag}`, true);
             if (log.reason) embed.addField("Reason", log.reason);
@@ -200,11 +203,11 @@ async function guildBanAdd(guild, user) {
         const msg = await guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            await sleep(800);
+            await sleep(900);
             const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_ADD", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Date.now() - log.createdTimestamp < 1500) {
                     embed.addField("Banned by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
                     msg.edit(embed);
