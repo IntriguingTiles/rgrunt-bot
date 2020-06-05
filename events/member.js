@@ -136,7 +136,7 @@ async function guildMemberRemove(member) {
 
         embed.setAuthor("Member Left", member.user.displayAvatarURL());
 
-        embed.addField("Member For", moment(member.joinedTimestamp).fromNow(true));
+        if (member.joinedTimestamp) embed.addField("Member For", moment(member.joinedTimestamp).fromNow(true));
 
         embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.RED);
