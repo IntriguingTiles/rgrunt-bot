@@ -36,7 +36,7 @@ async function message(msg) {
     if (badWords.length === 0) return;
 
     badWords.forEach(word => {
-        if (msg.content.replace(/\u200e/g, "").match(word)) {
+        if (msg.content.replace(/[\u200e\u200b]/g, "").match(word)) {
             msg.delete();
             msg.badWords = true;
         }
