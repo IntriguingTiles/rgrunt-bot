@@ -53,7 +53,7 @@ async function messageDelete(msg) {
                 let attachments = "";
 
                 msg.attachments.forEach(attachment => {
-                    attachments += `${attachment.url}\n`;
+                    attachments += `${attachment.proxyURL}\n`;
                 });
 
                 embed.addField("Attachments", attachments);
