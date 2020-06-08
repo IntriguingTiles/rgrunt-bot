@@ -28,6 +28,7 @@ exports.run = async (client, msg, args, guildSettings) => {
             const badNames = client.badNames.get(msg.guild.id);
 
             msg.guild.members.cache.forEach(async member => {
+                if (!member.manageable) return;
                 badNames.forEach(name => {
                     if (member.displayName.match(name[0])) {
                         if (name[1]) member.setNickname(name[1]);
