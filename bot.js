@@ -10,6 +10,7 @@ const server = express();
 const client = new Discord.Client({ disableMentions: "everyone", partials: ["MESSAGE"] });
 client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: false, ensureProps: true });
 client.badWords = new Discord.Collection();
+client.badNames = new Discord.Collection();
 client.login(process.env.TOKEN);
 
 const defaultSettings = {
@@ -19,7 +20,8 @@ const defaultSettings = {
     jailRole: null,
     modRoles: [],
     logFlags: 0,
-    badWords: []
+    badWords: [],
+    badNames: []
 };
 
 process.on("unhandledRejection", err => {
@@ -37,7 +39,8 @@ client.on("ready", () => {
     client.user.setActivity(`${defaultSettings.prefix}help`);
 
     client.guilds.cache.forEach(guild => {
-        client.regenRegex(guild.id);
+        client.regenWordRegex(guild.id);
+        client.regenNameRegex(guild.id);
     });
 });
 
@@ -127,7 +130,7 @@ client.loadEvents = () => {
     console.log(`Loaded ${events.length} events!`);
 };
 
-client.regenRegex = guildID => {
+client.regenWordRegex = guildID => {
     const guildSettings = client.guildSettings.ensure(guildID, defaultSettings);
     client.badWords.set(guildID, []);
 
@@ -141,6 +144,23 @@ client.regenRegex = guildID => {
         }
 
         client.badWords.get(guildID).push(new RegExp(regex, "i"));
+    });
+};
+
+client.regenNameRegex = guildID => {
+    const guildSettings = client.guildSettings.ensure(guildID, defaultSettings);
+    client.badNames.set(guildID, []);
+
+    guildSettings.badNames.forEach(badName => {
+        // this gets a bit wacky since lookalikes might change in between bot restarts
+        let regex = "";
+
+        for (let i = 0; i < badName[0].length; i++) {
+            if (badName[0].charAt(i) === "\\" || badName[0].charAt(i) === "]" || badName[0].charAt(i) === "-") continue;
+            regex += `[${lookalikes[badName[0].toLowerCase().charAt(i)] ? lookalikes[badName[0].toLowerCase().charAt(i)] : badName[0].charAt(i)}]`;
+        }
+
+        client.badNames.get(guildID).push([new RegExp(regex, "ig"), badName[1]]);
     });
 };
 

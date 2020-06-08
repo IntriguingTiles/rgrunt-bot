@@ -22,7 +22,7 @@ exports.run = async (client, msg, args, guildSettings) => {
 
             guildSettings.badWords.push(args[1].toLowerCase());
             client.guildSettings.set(msg.guild.id, guildSettings);
-            client.regenRegex(msg.guild.id);
+            client.regenWordRegex(msg.guild.id);
 
             msg.channel.send(`Successfully added \`${args[1]}\` to the word filter`);
             break;
@@ -33,7 +33,7 @@ exports.run = async (client, msg, args, guildSettings) => {
 
             guildSettings.badWords = guildSettings.badWords.filter(word => word !== args[1].toLowerCase());
             client.guildSettings.set(msg.guild.id, guildSettings);
-            client.regenRegex(msg.guild.id);
+            client.regenWordRegex(msg.guild.id);
 
             msg.channel.send(`Successfully removed \`${args[1]}\` from the word filter`);
             break;
