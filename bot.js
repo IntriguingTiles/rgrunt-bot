@@ -157,6 +157,17 @@ client.regenNameRegex = guildID => {
 
         for (let i = 0; i < badName[0].length; i++) {
             if (badName[0].charAt(i) === "\\" || badName[0].charAt(i) === "]" || badName[0].charAt(i) === "-") continue;
+
+            if (badName[0].charAt(i) === "^" && i === 0) {
+                regex += "^";
+                continue;
+            }
+            
+            if (badName[0].chatAt(i) === "+" && i === badName[0].length - 1) {
+                regex += "+";
+                continue;
+            }
+
             regex += `[${lookalikes[badName[0].toLowerCase().charAt(i)] ? lookalikes[badName[0].toLowerCase().charAt(i)] : badName[0].charAt(i)}]`;
         }
 
