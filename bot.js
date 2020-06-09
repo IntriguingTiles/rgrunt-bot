@@ -162,8 +162,8 @@ client.regenNameRegex = guildID => {
                 regex += "^";
                 continue;
             }
-            
-            if (badName[0].chatAt(i) === "+" && i === badName[0].length - 1) {
+
+            if (badName[0].charAt(i) === "+" && i === badName[0].length - 1) {
                 regex += "+";
                 continue;
             }
