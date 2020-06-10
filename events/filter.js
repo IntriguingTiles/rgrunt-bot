@@ -75,16 +75,25 @@ async function messageUpdate(oldMsg, newMsg) {
 async function guildMemberAdd(member) {
     if (!member.manageable) return;
     if (!client.badNames.has(member.guild.id)) return;
-    
+
     const badNames = client.badNames.get(member.guild.id);
 
     badNames.forEach(name => {
         if (member.displayName.match(name[0])) {
             if (name[1]) member.setNickname(name[1]);
             else {
-                if (member.displayName.replace(name[0], "").trim().length === 0 && member.user.username.match(name[0])) member.setNickname("unnamed", "Name filter");
-                else if (member.displayName.replace(name[0], "").trim().length === 0) member.setNickname("", "Name filter");
-                else member.setNickname(member.displayName.replace(name[0], ""), "Name filter");
+                let finalName = member.displayName.replace(name[0], "");
+
+                while (finalName.match(name[0])) {
+                    finalName = finalName.replace(name[0], "");
+                }
+
+                if (finalName.trim().length === 0) {
+                    if (member.user.username.match(name[0])) member.setNickname("unnamed", "Name filter");
+                    else member.setNickname("", "Name filter");
+                }
+
+                member.setNickname(finalName, "Name filter");
             }
         }
     });
@@ -104,9 +113,18 @@ async function guildMemberUpdate(oldMember, newMember) {
         if (newMember.displayName.match(name[0])) {
             if (name[1]) newMember.setNickname(name[1]);
             else {
-                if (newMember.displayName.replace(name[0], "").trim().length === 0 && newMember.user.username.match(name[0])) newMember.setNickname("unnamed", "Name filter");
-                else if (newMember.displayName.replace(name[0], "").trim().length === 0) newMember.setNickname("", "Name filter");
-                else newMember.setNickname(newMember.displayName.replace(name[0], ""), "Name filter");
+                let finalName = newMember.displayName.replace(name[0], "");
+
+                while (finalName.match(name[0])) {
+                    finalName = finalName.replace(name[0], "");
+                }
+
+                if (finalName.trim().length === 0) {
+                    if (newMember.user.username.match(name[0])) newMember.setNickname("unnamed", "Name filter");
+                    else newMember.setNickname("", "Name filter");
+                }
+
+                newMember.setNickname(finalName, "Name filter");
             }
         }
     });
