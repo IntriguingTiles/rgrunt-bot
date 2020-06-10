@@ -82,10 +82,10 @@ async function guildMemberAdd(member) {
         if (member.displayName.match(name[0])) {
             if (name[1]) member.setNickname(name[1]);
             else {
-                let finalName = member.displayName.replace(name[0], "");
+                let finalName = member.displayName.replace(name[0], "").trim();
 
                 while (finalName.match(name[0])) {
-                    finalName = finalName.replace(name[0], "");
+                    finalName = finalName.replace(name[0], "").trim();
                 }
 
                 if (finalName.trim().length === 0) {
