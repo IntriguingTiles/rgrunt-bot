@@ -20,7 +20,7 @@ exports.run = async (client, msg, args, guildSettings) => {
         case "add":
             if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter add <word>`, { code: "" });
 
-            guildSettings.badWords.push(args[1].toLowerCase());
+            guildSettings.badWords.push(args.slice(1).join(" "));
             client.guildSettings.set(msg.guild.id, guildSettings);
             client.regenWordRegex(msg.guild.id);
 
@@ -29,9 +29,9 @@ exports.run = async (client, msg, args, guildSettings) => {
         case "remove":
             if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter remove <word>`, { code: "" });
 
-            if (!guildSettings.badWords.includes(args[1].toLowerCase())) return msg.channel.send("Word not found in filter");
+            if (!guildSettings.badWords.includes(args.slice(1).join(" "))) return msg.channel.send("Word not found in filter");
 
-            guildSettings.badWords = guildSettings.badWords.filter(word => word !== args[1].toLowerCase());
+            guildSettings.badWords = guildSettings.badWords.filter(word => word !== args.slice(1).join(" "));
             client.guildSettings.set(msg.guild.id, guildSettings);
             client.regenWordRegex(msg.guild.id);
 
