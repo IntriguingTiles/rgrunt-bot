@@ -91,6 +91,7 @@ async function guildMemberAdd(member) {
                 if (finalName.trim().length === 0) {
                     if (member.user.username.match(name[0])) member.setNickname("unnamed", "Name filter");
                     else member.setNickname("", "Name filter");
+                    return;
                 }
 
                 member.setNickname(finalName, "Name filter");
@@ -122,6 +123,7 @@ async function guildMemberUpdate(oldMember, newMember) {
                 if (finalName.trim().length === 0) {
                     if (newMember.user.username.match(name[0])) newMember.setNickname("unnamed", "Name filter");
                     else newMember.setNickname("", "Name filter");
+                    return;
                 }
 
                 newMember.setNickname(finalName, "Name filter");
