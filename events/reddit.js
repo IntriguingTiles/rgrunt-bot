@@ -67,4 +67,4 @@ setInterval(() => {
         // while this may cause duplicates, it really doesn't matter for us
         watchedSubs = watchedSubs.concat(settings.subreddits);
     });
-}, 60000);
+}, 10000);
