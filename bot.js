@@ -21,9 +21,7 @@ const defaultSettings = {
     modRoles: [],
     logFlags: 0,
     badWords: [],
-    badNames: [],
-    subreddits: [],
-    subredditChannel: null
+    badNames: []
 };
 
 process.on("unhandledRejection", err => {
