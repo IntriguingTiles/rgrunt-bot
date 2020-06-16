@@ -42,27 +42,30 @@ exports.deregister = () => {
 
 async function onNewPost(post) {
     const embed = new MessageEmbed();
-    embed.setAuthor(`New ${determineType(post.post_hint)}post on /r/${post.subreddit.display_name}`, "https://cdn.discordapp.com/attachments/408346940234006559/722275130276970546/reddit.png", `https://www.reddit.com${post.permalink}`);
+    embed.setAuthor(`New ${determineType(post.post_hint, post.url)}post on /r/${post.subreddit.display_name}`, "https://cdn.discordapp.com/attachments/408346940234006559/722275130276970546/reddit.png", `https://www.reddit.com${post.permalink}`);
     embed.setTitle(post.title);
     embed.setURL(post.url);
     embed.addField("Post Author", `/u/${post.author.name}`);
     embed.setColor(colors.RED);
-    embed.setImage(post.url); // we can do this because discord doesn't care if the image is really an image
+    if (determineType(post.post_hist, post.url) === "image ") embed.setImage(post.url);
     embed.setTimestamp();
 
     if (post.is_self) embed.setDescription(truncate(post.selftext, 1500, 15));
 
     client.guildSettings.forEach(settings => {
-        if (settings.subreddits.includes(post.subreddit.display_name.toLowerCase()) && settings.subredditChannel) client.channels.cache.get(settings.subredditChannel).send(embed);
+        if (settings.subreddits.includes(post.subreddit.display_name.toLowerCase()) && settings.subredditChannel && client.channels.cache.has(settings.subredditChannel)) client.channels.cache.get(settings.subredditChannel).send(embed);
     });
 }
 
 /**
  * @param {string} type 
+ * @param {string} url
  */
-function determineType(type) {
+function determineType(type, url) {
     if (type && type.includes("video")) return "video ";
     if (type && type.includes("image")) return "image ";
+    if (url.startsWith("https://i.redd.it")) return "image ";
+    if (!url.startsWith("https://www.reddit.com")) return "link ";
     return "";
 }
 
