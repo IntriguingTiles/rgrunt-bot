@@ -42,9 +42,9 @@ async function onNewPost(post) {
         embed.setURL(post.url);
         embed.addField("Post Author", `/u/${post.author.name}`);
         embed.setColor(colors.RED);
+        embed.setImage(post.url); // we can do this because discord doesn't care if the image is really an image
 
-        if (determineType(post.post_hint) === "image") embed.setImage(post.url);
-        else if (post.is_self) embed.setDescription(post.selftext);
+        if (post.is_self) embed.setDescription(post.selftext);
 
         client.guildSettings.forEach(settings => {
             if (settings.subreddits.includes(post.subreddit.display_name.toLowerCase()) && settings.subredditChannel) client.channels.cache.get(settings.subredditChannel).send(embed);
