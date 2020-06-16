@@ -48,6 +48,8 @@ async function onNewPost(post) {
     embed.addField("Post Author", `/u/${post.author.name}`);
     embed.setColor(colors.RED);
     embed.setImage(post.url); // we can do this because discord doesn't care if the image is really an image
+    embed.setFooter(`ID: ${post.id}`);
+    embed.setTimestamp(post.created);
 
     if (post.is_self) embed.setDescription(truncate(post.selftext, 1000, 15));
 
