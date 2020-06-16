@@ -8,9 +8,9 @@ const snoostream = require("snoostream")({
     password: process.env.REDDIT_PASS
 });
 
-const allStream = snoostream.submissionStream("all");
 const colors = require("../utils/colors.js");
 let watchedSubs = [];
+let streams = [];
 
 /** @type {Client} */
 let client;
@@ -22,34 +22,37 @@ exports.register = c => {
     client = c;
 
     client.guildSettings.forEach(settings => {
-        // while this may cause duplicates, it really doesn't matter for us
         watchedSubs = watchedSubs.concat(settings.subreddits);
     });
 
-    allStream.on("post", onNewPost);
+    // now get rid of the duplicates
+    watchedSubs = watchedSubs.filter((sub, index) => watchedSubs.indexOf(sub) === index);
+
+    // now add stream listeners for all the watched subs
+    watchedSubs.forEach(sub => streams.push(snoostream.submissionStream(sub, { rate: 5000 }))); // poll every 5 seconds
+    streams.forEach(stream => stream.on("post", onNewPost));
 };
 
 exports.deregister = () => {
-    allStream.removeListener("post", onNewPost);
+    streams.forEach(stream => stream.removeListener("post", onNewPost)); // no clue if this is necessary, but better safe than sorry
     watchedSubs = [];
+    streams = [];
 };
 
 async function onNewPost(post) {
-    if (watchedSubs.includes(post.subreddit.display_name.toLowerCase())) {
-        const embed = new MessageEmbed();
-        embed.setAuthor(`New ${determineType(post.post_hint)}post on /r/${post.subreddit.display_name}`, "https://cdn.discordapp.com/attachments/408346940234006559/722275130276970546/reddit.png", `https://www.reddit.com${post.permalink}`);
-        embed.setTitle(post.title);
-        embed.setURL(post.url);
-        embed.addField("Post Author", `/u/${post.author.name}`);
-        embed.setColor(colors.RED);
-        embed.setImage(post.url); // we can do this because discord doesn't care if the image is really an image
+    const embed = new MessageEmbed();
+    embed.setAuthor(`New ${determineType(post.post_hint)}post on /r/${post.subreddit.display_name}`, "https://cdn.discordapp.com/attachments/408346940234006559/722275130276970546/reddit.png", `https://www.reddit.com${post.permalink}`);
+    embed.setTitle(post.title);
+    embed.setURL(post.url);
+    embed.addField("Post Author", `/u/${post.author.name}`);
+    embed.setColor(colors.RED);
+    embed.setImage(post.url); // we can do this because discord doesn't care if the image is really an image
 
-        if (post.is_self) embed.setDescription(post.selftext);
+    if (post.is_self) embed.setDescription(post.selftext);
 
-        client.guildSettings.forEach(settings => {
-            if (settings.subreddits.includes(post.subreddit.display_name.toLowerCase()) && settings.subredditChannel) client.channels.cache.get(settings.subredditChannel).send(embed);
-        });
-    }
+    client.guildSettings.forEach(settings => {
+        if (settings.subreddits.includes(post.subreddit.display_name.toLowerCase()) && settings.subredditChannel) client.channels.cache.get(settings.subredditChannel).send(embed);
+    });
 }
 
 /**
@@ -62,9 +65,10 @@ function determineType(type) {
 }
 
 setInterval(() => {
-    watchedSubs = [];
-    client.guildSettings.forEach(settings => {
-        // while this may cause duplicates, it really doesn't matter for us
-        watchedSubs = watchedSubs.concat(settings.subreddits);
-    });
-}, 10000);
+    if (client.updateWatchedSubreddits) {
+        // this couldn't possibly go wrong :)
+        exports.deregister();
+        exports.register(client);
+        client.updateWatchedSubreddits = false;
+    }
+}, 5000);

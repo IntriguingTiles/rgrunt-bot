@@ -28,6 +28,7 @@ exports.run = async (client, msg, args, guildSettings) => {
             client.guildSettings.set(msg.guild.id, guildSettings);
 
             msg.channel.send(`Now watching \`/r/${subreddit}\`.`);
+            client.updateWatchedSubreddits = true;
             break;
         }
         case "remove": {
@@ -42,6 +43,7 @@ exports.run = async (client, msg, args, guildSettings) => {
             client.guildSettings.set(msg.guild.id, guildSettings);
 
             msg.channel.send(`No longer watching \`/r/${subreddit}\`.`);
+            client.updateWatchedSubreddits = true;
             break;
         }
         case "list": {
