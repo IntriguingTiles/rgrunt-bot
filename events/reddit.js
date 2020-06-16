@@ -37,7 +37,7 @@ exports.deregister = () => {
 async function onNewPost(post) {
     if (watchedSubs.includes(post.subreddit.display_name.toLowerCase())) {
         const embed = new MessageEmbed();
-        embed.setAuthor(`New ${determineType(post.post_hint)} post on /r/${post.subreddit.display_name}`, "https://cdn.discordapp.com/attachments/408346940234006559/722275130276970546/reddit.png", `https://www.reddit.com${post.permalink}`);
+        embed.setAuthor(`New ${determineType(post.post_hint)}post on /r/${post.subreddit.display_name}`, "https://cdn.discordapp.com/attachments/408346940234006559/722275130276970546/reddit.png", `https://www.reddit.com${post.permalink}`);
         embed.setTitle(post.title);
         embed.setURL(post.url);
         embed.addField("Post Author", `/u/${post.author.name}`);
@@ -56,9 +56,9 @@ async function onNewPost(post) {
  * @param {string} type 
  */
 function determineType(type) {
-    if (type && type.includes("video")) return "video";
-    if (type && type.includes("image")) return "image";
-    else return "text";
+    if (type && type.includes("video")) return "video ";
+    if (type && type.includes("image")) return "image ";
+    return "";
 }
 
 setInterval(() => {
