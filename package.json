@@ -25,6 +25,7 @@
     "erlpack": "github:discordapp/erlpack",
     "express": "^4.17.1",
     "moment": "^2.26.0",
+    "snoostream": "github:asundheim/snoostream",
     "utf-8-validate": "^5.0.2",
     "zlib-sync": "^0.1.7"
   },

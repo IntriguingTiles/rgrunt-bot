@@ -18,43 +18,43 @@ exports.run = async (client, msg, args, guildSettings) => {
 
     switch (args[0]) {
         case "enable":
-            if (args.length !== 2) return msg.channel.send(`\`\`\`Usage: ${guildSettings.prefix}logs enable <log type>\`\`\`\nUse \`${guildSettings.prefix}logs list\` to see the available log types`);
-            if (!guildSettings.logChannel) return msg.channel.send(`Use \`${guildSettings.prefix}logs channel\` to set the log channel first`);
+            if (args.length !== 2) return msg.channel.send(`\`\`\`Usage: ${guildSettings.prefix}logs enable <log type>\`\`\`\nUse \`${guildSettings.prefix}logs list\` to see the available log types.`);
+            if (!guildSettings.logChannel) return msg.channel.send(`Use \`${guildSettings.prefix}logs channel\` to set the log channel first.`);
 
             if (args[1] === "all") {
                 for (let i = 0; i < flags.logs.TOTAL; i++) {
                     guildSettings.logFlags |= 1 << i;
                 }
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Enabled all log types");
+                msg.channel.send("Enabled all log types.");
                 return;
             }
 
             if (flags.logs[args[1].toUpperCase()]) {
                 guildSettings.logFlags |= flags.logs[args[1].toUpperCase()];
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Enabled ${flags.logsStrings(flags.logs[args[1].toUpperCase()]).split(" - ")[0]} logs`);
+                msg.channel.send(`Enabled ${flags.logsStrings(flags.logs[args[1].toUpperCase()]).split(" - ")[0]} logs.`);
             } else {
-                msg.channel.send(`Log type not found. Use \`${guildSettings.prefix}logs list\` to see the available log types`);
+                msg.channel.send(`Log type not found. Use \`${guildSettings.prefix}logs list\` to see the available log types.`);
             }
 
             break;
         case "disable":
-            if (args.length !== 2) return msg.channel.send(`\`\`\`Usage: ${guildSettings.prefix}logs disable <log type>\`\`\`\nUse \`${guildSettings.prefix}logs list\` to see the available log types`);
-            if (!guildSettings.logChannel) return msg.channel.send(`Use \`${guildSettings.prefix}logs channel\` to set the log channel first`);
+            if (args.length !== 2) return msg.channel.send(`\`\`\`Usage: ${guildSettings.prefix}logs disable <log type>\`\`\`\nUse \`${guildSettings.prefix}logs list\` to see the available log types.`);
+            if (!guildSettings.logChannel) return msg.channel.send(`Use \`${guildSettings.prefix}logs channel\` to set the log channel first.`);
 
             if (args[1] === "all") {
                 guildSettings.logFlags = 0;
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Disabled all log types");
+                msg.channel.send("Disabled all log types.");
             }
 
             if (flags.logs[args[1].toUpperCase()]) {
                 guildSettings.logFlags ^= flags.logs[args[1].toUpperCase()];
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Disabled ${flags.logsStrings(flags.logs[args[1].toUpperCase()]).split(" - ")[0]} logs`);
+                msg.channel.send(`Disabled ${flags.logsStrings(flags.logs[args[1].toUpperCase()]).split(" - ")[0]} logs.`);
             } else {
-                msg.channel.send(`Log type not found. Use \`${guildSettings.prefix}logs list\` to see the available log types`);
+                msg.channel.send(`Log type not found. Use \`${guildSettings.prefix}logs list\` to see the available log types.`);
             }
 
             break;
@@ -79,7 +79,7 @@ exports.run = async (client, msg, args, guildSettings) => {
             if (args[1] === "clear") {
                 guildSettings.logChannel = null;
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Successfully cleared the logging channel");
+                msg.channel.send("Successfully cleared the logging channel.");
                 return;
             }
 
@@ -90,14 +90,13 @@ exports.run = async (client, msg, args, guildSettings) => {
 
             const ch = msg.guild.channels.cache.get(channelID);
 
-            if (!ch) return msg.channel.send("Channel not found");
-            if (ch.type !== "text") return msg.channel.send("Not a text channel");
+            if (!ch) return msg.channel.send("Channel not found.");
+            if (ch.type !== "text") return msg.channel.send("Not a text channel.");
 
             guildSettings.logChannel = channelID;
             client.guildSettings.set(msg.guild.id, guildSettings);
 
-            msg.channel.send(`Successfully set the logging channel to ${ch}`);
-
+            msg.channel.send(`Successfully set the logging channel to ${ch}.`);
             break;
         }
         default:

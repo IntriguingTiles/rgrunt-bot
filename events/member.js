@@ -139,7 +139,7 @@ async function guildMemberRemove(member) {
         if (member.joinedTimestamp) embed.addField("Member For", moment(member.joinedTimestamp).fromNow(true));
 
         embed.setThumbnail(member.user.displayAvatarURL());
-        embed.setColor(colors.RED);
+        embed.setColor(colors.ORANGE);
         embed.setDescription(`${member.user} ${member.user.tag}`);
         embed.setFooter(`ID: ${member.id}`);
         embed.setTimestamp();
@@ -163,7 +163,7 @@ async function guildMemberKick(member) {
 
         embed.setAuthor("Member Kicked", member.user.displayAvatarURL());
         embed.setThumbnail(member.user.displayAvatarURL());
-        embed.setColor(colors.RED);
+        embed.setColor(colors.ORANGE);
         embed.addField("Member", `${member.user} ${member.user.tag}`, true);
 
         if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Date.now() - logs.entries.first().createdAt < 1500) {
@@ -195,7 +195,7 @@ async function guildBanAdd(guild, user) {
 
         embed.setAuthor("Member Banned", user.displayAvatarURL());
         embed.setThumbnail(user.displayAvatarURL());
-        embed.setColor(colors.RED);
+        embed.setColor(colors.ORANGE);
         embed.addField("Member", `${user} ${user.tag}`, true);
         embed.setFooter(`ID: ${user.id}`);
         embed.setTimestamp();

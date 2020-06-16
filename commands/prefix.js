@@ -18,5 +18,5 @@ exports.run = async (client, msg, args, guildSettings) => {
     guildSettings.prefix = args[0];
     client.guildSettings.set(msg.guild.id, guildSettings);
 
-    msg.channel.send(`The prefix has been successfully updated to \`${guildSettings.prefix}\``);
+    msg.channel.send(`The prefix has been successfully updated to \`${guildSettings.prefix}\`.`);
 };

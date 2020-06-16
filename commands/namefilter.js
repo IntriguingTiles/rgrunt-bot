@@ -19,11 +19,12 @@ exports.run = async (client, msg, args, guildSettings) => {
     switch (args[0]) {
         case "add": {
             if (args.length < 2) return msg.channel.send(`${guildSettings.prefix}namefilter add <word> [replacement]`, { code: "" });
+            if (guildSettings.badNames.includes(args[1].toLowerCase())) return msg.channel.send("That name is already in the name filter.");
 
             args.length > 2 ? guildSettings.badNames.push([args[1].toLowerCase(), args.slice(2).join(" ")]) : guildSettings.badNames.push([args[1].toLowerCase()]);
             client.guildSettings.set(msg.guild.id, guildSettings);
             client.regenNameRegex(msg.guild.id);
-            msg.channel.send(`Successfully added \`${args[1]}\` to the name filter`);
+            msg.channel.send(`Successfully added \`${args[1]}\` to the name filter.`);
 
             const badNames = client.badNames.get(msg.guild.id);
 
@@ -46,13 +47,13 @@ exports.run = async (client, msg, args, guildSettings) => {
         case "remove": {
             if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}namefilter remove <word>`, { code: "" });
 
-            if (guildSettings.badNames.filter(name => name[0] === args[1].toLowerCase()).length === 0) return msg.channel.send("Name not found in filter");
+            if (guildSettings.badNames.filter(name => name[0] === args[1].toLowerCase()).length === 0) return msg.channel.send("Name not found in filter.");
 
             guildSettings.badNames = guildSettings.badNames.filter(name => name[0] !== args[1].toLowerCase());
             client.guildSettings.set(msg.guild.id, guildSettings);
             client.regenNameRegex(msg.guild.id);
 
-            msg.channel.send(`Successfully removed \`${args[1]}\` from the name filter`);
+            msg.channel.send(`Successfully removed \`${args[1]}\` from the name filter.`);
             break;
         }
         case "list": {

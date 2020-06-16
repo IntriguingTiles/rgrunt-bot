@@ -19,23 +19,24 @@ exports.run = async (client, msg, args, guildSettings) => {
     switch (args[0]) {
         case "add":
             if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter add <word>`, { code: "" });
+            if (guildSettings.badWords.includes(args.slice(1).join(" "))) return msg.channel.send("That word is already in the filter.");
 
             guildSettings.badWords.push(args.slice(1).join(" "));
             client.guildSettings.set(msg.guild.id, guildSettings);
             client.regenWordRegex(msg.guild.id);
 
-            msg.channel.send(`Successfully added \`${args[1]}\` to the word filter`);
+            msg.channel.send(`Successfully added \`${args[1]}\` to the word filter.`);
             break;
         case "remove":
             if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}filter remove <word>`, { code: "" });
 
-            if (!guildSettings.badWords.includes(args.slice(1).join(" "))) return msg.channel.send("Word not found in filter");
+            if (!guildSettings.badWords.includes(args.slice(1).join(" "))) return msg.channel.send("Word not found in filter.");
 
             guildSettings.badWords = guildSettings.badWords.filter(word => word !== args.slice(1).join(" "));
             client.guildSettings.set(msg.guild.id, guildSettings);
             client.regenWordRegex(msg.guild.id);
 
-            msg.channel.send(`Successfully removed \`${args[1]}\` from the word filter`);
+            msg.channel.send(`Successfully removed \`${args[1]}\` from the word filter.`);
             break;
         case "list": {
             let final = "";

@@ -37,7 +37,7 @@ exports.run = async (client, msg, args, guildSettings) => {
                 final += `${prefix}${command}${cmd.help.requireMod ? " (moderators/administrators only)" : ""}${cmd.help.requireAdmin ? " (administrators only)" : ""}\n`;
             }
         }
-        final += `\`\`\`\nTo get more info about a command, use \`${prefix}help [command]\``;
+        final += `\`\`\`\nTo get more info about a command, use \`${prefix}help [command]\`.`;
         msg.channel.send(final);
     }
 };

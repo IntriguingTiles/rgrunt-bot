@@ -23,12 +23,13 @@ exports.run = async (client, msg, args, guildSettings) => {
 
                     const role = args[2].match(/[0-9]+/) ? args[2].match(/[0-9]+/)[0] : null;
 
-                    if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found!");
+                    if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
+                    if (guildSettings.modRoles.includes(role)) return msg.channel.send("Role is already in the moderators list.");
 
                     guildSettings.modRoles.push(role);
                     client.guildSettings.set(msg.guild.id, guildSettings);
 
-                    msg.channel.send(`Successfully added \`${msg.guild.roles.cache.get(role).name}\` to the moderator roles list`);
+                    msg.channel.send(`Successfully added \`${msg.guild.roles.cache.get(role).name}\` to the moderator roles list.`);
                     break;
                 }
                 case "remove": {
@@ -36,13 +37,13 @@ exports.run = async (client, msg, args, guildSettings) => {
 
                     const role = args[2].match(/[0-9]+/) ? args[2].match(/[0-9]+/)[0] : null;
 
-                    if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found!");
-                    if (!guildSettings.modRoles.includes(role)) return msg.channel.send("Role is not part of the moderators list!");
+                    if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
+                    if (!guildSettings.modRoles.includes(role)) return msg.channel.send("Role is not part of the moderators list.");
 
                     guildSettings.modRoles = guildSettings.modRoles.filter(val => val !== role);
                     client.guildSettings.set(msg.guild.id, guildSettings);
 
-                    msg.channel.send(`Successfully removed \`${msg.guild.roles.cache.get(role).name}\` from the moderator roles list`);
+                    msg.channel.send(`Successfully removed \`${msg.guild.roles.cache.get(role).name}\` from the moderator roles list.`);
 
                     break;
                 }
@@ -75,15 +76,15 @@ exports.run = async (client, msg, args, guildSettings) => {
             if (args[1] === "clear") {
                 guildSettings.verifyRole = null;
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Successfully cleared the verified role");
+                msg.channel.send("Successfully cleared the verified role.");
             } else {
                 const role = args[1].match(/[0-9]+/) ? args[1].match(/[0-9]+/)[0] : null;
 
-                if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found!");
+                if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
 
                 guildSettings.verifyRole = role;
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Successfully set \`${msg.guild.roles.cache.get(role).name}\` as the verified role`);
+                msg.channel.send(`Successfully set \`${msg.guild.roles.cache.get(role).name}\` as the verified role.`);
             }
             break;
         case "jail":
@@ -92,15 +93,15 @@ exports.run = async (client, msg, args, guildSettings) => {
             if (args[1] === "clear") {
                 guildSettings.jailRole = null;
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Successfully cleared the jailed role");
+                msg.channel.send("Successfully cleared the jailed role.");
             } else {
                 const role = args[1].match(/[0-9]+/) ? args[1].match(/[0-9]+/)[0] : null;
 
-                if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found!");
+                if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
 
                 guildSettings.jailRole = role;
                 client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Successfully set \`${msg.guild.roles.cache.get(role).name}\` as the jailed role`);
+                msg.channel.send(`Successfully set \`${msg.guild.roles.cache.get(role).name}\` as the jailed role.`);
             }
             break;
         default:

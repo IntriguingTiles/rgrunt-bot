@@ -138,7 +138,7 @@ async function roleDelete(role) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Role Deleted", role.guild.iconURL());
-        embed.setColor(colors.RED);
+        embed.setColor(colors.ORANGE);
         embed.addField("Name", role.name, true);
         embed.setFooter(`ID: ${role.id}`);
         embed.setTimestamp();

@@ -22,10 +22,10 @@ exports.run = async (client, msg, args, guildSettings) => {
     try {
         const member = await fetchMember(client, msg, args);
         if (member.roles.cache.has(guildSettings.jailRole)) {
-            member.roles.remove(guildSettings.jailRole, `Unjailed by ${msg.author.tag}.`);
+            member.roles.remove(guildSettings.jailRole, `Unjailed by ${msg.author.tag}`);
             msg.channel.send("Unjailed!");
         } else {
-            member.roles.add(guildSettings.jailRole, `Jailed by ${msg.author.tag}.`);
+            member.roles.add(guildSettings.jailRole, `Jailed by ${msg.author.tag}`);
             msg.channel.send("Jailed!");
         }
     } catch (err) {

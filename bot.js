@@ -8,7 +8,7 @@ const lookalikes = require("./utils/lookalikes.js");
 const server = express();
 
 const client = new Discord.Client({ disableMentions: "everyone", partials: ["MESSAGE"] });
-client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: false, ensureProps: true });
+client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: true, ensureProps: true });
 client.badWords = new Discord.Collection();
 client.badNames = new Discord.Collection();
 client.login(process.env.TOKEN);
@@ -21,7 +21,9 @@ const defaultSettings = {
     modRoles: [],
     logFlags: 0,
     badWords: [],
-    badNames: []
+    badNames: [],
+    subreddits: [],
+    subredditChannel: null
 };
 
 process.on("unhandledRejection", err => {

@@ -18,7 +18,7 @@ exports.run = async (client, msg, args, guildSettings) => {
     if (args.length === 0) return msg.channel.send(`${guildSettings.prefix}${exports.help.usage}`, { code: "" });
 
     try {
-        (await fetchMember(client, msg, args)).roles.add(guildSettings.verifyRole, `Verified by ${msg.author.tag}.`);
+        (await fetchMember(client, msg, args)).roles.add(guildSettings.verifyRole, `Verified by ${msg.author.tag}`);
         msg.channel.send("Verified!");
     } catch (err) {
         msg.channel.send("Failed to add the verified role!");

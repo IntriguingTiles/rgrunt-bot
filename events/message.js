@@ -38,7 +38,7 @@ async function messageDelete(msg) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Message Deleted", msg.guild.iconURL());
-        embed.setColor(colors.RED);
+        embed.setColor(colors.ORANGE);
 
         if (!msg.partial) {
             if (msg.author.bot) return;

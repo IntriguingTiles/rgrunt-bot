@@ -126,7 +126,7 @@ async function channelDelete(ch) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Channel Deleted", ch.guild.iconURL());
-        embed.setColor(colors.RED);
+        embed.setColor(colors.ORANGE);
         embed.addField("Name", ch.name, true);
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();

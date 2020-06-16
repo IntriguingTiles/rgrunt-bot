@@ -109,7 +109,7 @@ async function emojiDelete(emoji) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Emoji Deleted", emoji.guild.iconURL());
-        embed.setColor(colors.RED);
+        embed.setColor(colors.ORANGE);
         embed.addField("Name", emoji.name, true);
         embed.setThumbnail(emoji.url);
         embed.setFooter(`ID: ${emoji.id}`);
