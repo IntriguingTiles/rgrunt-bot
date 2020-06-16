@@ -51,7 +51,7 @@ async function onNewPost(post) {
     embed.setFooter(`ID: ${post.id}`);
     embed.setTimestamp(post.created);
 
-    if (post.is_self) embed.setDescription(truncate(post.selftext, 1000, 15));
+    if (post.is_self) embed.setDescription(truncate(post.selftext, 1500, 15));
 
     client.guildSettings.forEach(settings => {
         if (settings.subreddits.includes(post.subreddit.display_name.toLowerCase()) && settings.subredditChannel) client.channels.cache.get(settings.subredditChannel).send(embed);
