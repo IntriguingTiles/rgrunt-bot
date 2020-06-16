@@ -2,6 +2,7 @@ const { Client, MessageEmbed, Message } = require("discord.js"); // eslint-disab
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
+const truncate = require("../utils/truncate.js");
 const sleep = require("util").promisify(setTimeout);
 
 /** @type {Client} */
@@ -47,7 +48,7 @@ async function messageDelete(msg) {
             embed.addField("Author", `${msg.author} ${msg.author.tag}`, true);
             embed.addField("Channel", `${msg.channel}`, true);
 
-            if (msg.content.length !== 0) embed.addField("Contents", cutOff(msg.content, 300, 8));
+            if (msg.content.length !== 0) embed.addField("Contents", truncate(msg.content, 300, 8));
 
             if (msg.attachments.size !== 0) {
                 let attachments = "";
@@ -109,8 +110,8 @@ async function messageUpdate(oldMsg, newMsg) {
         embed.addField("Channel", `${newMsg.channel}`, true);
 
         if (!oldMsg.partial) {
-            embed.addField("Before", oldMsg.content ? cutOff(oldMsg.content, 300, 4) : "None");
-            embed.addField("After", newMsg.content ? cutOff(newMsg.content, 300, 4) : "None");
+            embed.addField("Before", oldMsg.content ? truncate(oldMsg.content, 300, 4) : "None");
+            embed.addField("After", newMsg.content ? truncate(newMsg.content, 300, 4) : "None");
         }
 
         embed.setFooter(`ID: ${newMsg.id}`);
@@ -118,15 +119,4 @@ async function messageUpdate(oldMsg, newMsg) {
 
         newMsg.guild.channels.cache.get(guildSettings.logChannel).send(embed);
     }
-}
-
-/**
- * @param {string} str 
- * @param {number} maxLen 
- * @param {number} maxLines 
- */
-function cutOff(str, maxLen, maxLines) {
-    let finalStr = str.length > maxLen ? str.substr(0, maxLen) + "..." : str;
-    finalStr = finalStr.split("\n").length > maxLines ? finalStr.split("\n").slice(0, maxLines).join("\n") + "..." : finalStr;
-    return finalStr;
 }

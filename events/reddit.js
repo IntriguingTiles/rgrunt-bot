@@ -9,6 +9,7 @@ const snoostream = require("snoostream")({
 });
 
 const colors = require("../utils/colors.js");
+const truncate = require("../utils/truncate.js");
 let watchedSubs = [];
 let streams = [];
 
@@ -48,7 +49,7 @@ async function onNewPost(post) {
     embed.setColor(colors.RED);
     embed.setImage(post.url); // we can do this because discord doesn't care if the image is really an image
 
-    if (post.is_self) embed.setDescription(post.selftext);
+    if (post.is_self) embed.setDescription(truncate(post.selftext, 1000, 15));
 
     client.guildSettings.forEach(settings => {
         if (settings.subreddits.includes(post.subreddit.display_name.toLowerCase()) && settings.subredditChannel) client.channels.cache.get(settings.subredditChannel).send(embed);
