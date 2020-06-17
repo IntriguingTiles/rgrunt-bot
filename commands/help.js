@@ -3,9 +3,10 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "help",
     usage: "help [command]",
-    info: "View the commands list or get help on a command",
-    requireMod: true
+    info: "View the commands list or get help on a command"
 };
+
+exports.requireMod = true;
 
 /**
  * @param {Client} client
@@ -34,7 +35,7 @@ exports.run = async (client, msg, args, guildSettings) => {
         for (const command in client.commands) {
             const cmd = client.commands[command];
             if (cmd.help) {
-                final += `${prefix}${command}${cmd.help.requireMod ? " (moderators/administrators only)" : ""}${cmd.help.requireAdmin ? " (administrators only)" : ""}\n`;
+                final += `${prefix}${command}${cmd.requireMod ? " (moderators/administrators only)" : ""}${cmd.requireAdmin ? " (administrators only)" : ""}\n`;
             }
         }
         final += `\`\`\`\nTo get more info about a command, use \`${prefix}help [command]\`.`;

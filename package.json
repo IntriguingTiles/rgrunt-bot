@@ -19,7 +19,7 @@
   "dependencies": {
     "better-sqlite3": "^7.1.0",
     "bufferutil": "^4.0.1",
-    "discord.js": "^12.2.0",
+    "discord.js": "github:IntriguingTiles/discord.js#stable",
     "dotenv": "^8.2.0",
     "enmap": "^5.3.1",
     "erlpack": "github:discordapp/erlpack",

@@ -3,9 +3,10 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "namefilter",
     usage: "namefilter <add|remove|list> [args]",
-    info: "Sets the (nick)name filter",
-    requireAdmin: true
+    info: "Sets the (nick)name filter"
 };
+
+exports.requireAdmin = true;
 
 /**
  * @param {Client} client

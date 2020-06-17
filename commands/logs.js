@@ -4,9 +4,10 @@ const flags = require("../utils/flags.js");
 exports.help = {
     name: "logs",
     usage: "logs <enable|disable|list|channel> [args]",
-    info: "Sets the logging settings",
-    requireAdmin: true
+    info: "Sets the logging settings"
 };
+
+exports.requireAdmin = true;
 
 /**
  * @param {Client} client

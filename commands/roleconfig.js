@@ -3,9 +3,10 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "roleconfig",
     usage: "roleconfig <mods|verify|jail> <args>",
-    info: "Manage the moderator roles, the role used for the verify command, and the role used for the jail command",
-    requireAdmin: true
+    info: "Manage the moderator roles, the role used for the verify command, and the role used for the jail command"
 };
+
+exports.requireAdmin = true;
 
 /**
  * @param {Client} client

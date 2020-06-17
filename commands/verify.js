@@ -3,9 +3,10 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "verify",
     usage: "verify <@mention or id>",
-    info: "Gives the target user the verified role",
-    requireMod: true
+    info: "Gives the target user the verified role"
 };
+
+exports.requireMod = true;
 
 /**
  * @param {Client} client

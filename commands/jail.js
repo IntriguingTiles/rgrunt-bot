@@ -5,9 +5,10 @@ exports.aliases = ["unjail"];
 exports.help = {
     name: "jail",
     usage: "jail <@mention or id>",
-    info: "Jails/unjails the target user",
-    requireMod: true
+    info: "Jails/unjails the target user"
 };
+
+exports.requireMod = true;
 
 /**
  * @param {Client} client

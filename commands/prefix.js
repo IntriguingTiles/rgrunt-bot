@@ -3,9 +3,10 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "prefix",
     usage: "prefix <new prefix>",
-    info: "Sets the command prefix",
-    requireAdmin: true
+    info: "Sets the command prefix"
 };
+
+exports.requireAdmin = true;
 
 /**
  * @param {Client} client

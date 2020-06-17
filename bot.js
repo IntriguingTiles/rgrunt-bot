@@ -62,11 +62,11 @@ client.on("message", async msg => {
 
     if (!(cmd in client.commands)) return;
 
-    if (client.commands[cmd].help && client.commands[cmd].help.requireAdmin) {
+    if (client.commands[cmd].requireAdmin) {
         if (!msg.member.hasPermission("MANAGE_GUILD") && msg.author.id !== "221017760111656961") return;
     }
 
-    if (client.commands[cmd].help && client.commands[cmd].help) {
+    if (client.commands[cmd].requireMod) {
         if (!msg.member.hasPermission("MANAGE_GUILD") && msg.author.id !== "221017760111656961") {
             let hasPerms = false;
 

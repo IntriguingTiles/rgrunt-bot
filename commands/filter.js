@@ -3,9 +3,10 @@ const { Client, Message } = require("discord.js"); // eslint-disable-line no-unu
 exports.help = {
     name: "filter",
     usage: "filter <add|remove|list> [args]",
-    info: "Sets the word filter",
-    requireAdmin: true
+    info: "Sets the word filter"
 };
+
+exports.requireAdmin = true;
 
 /**
  * @param {Client} client
