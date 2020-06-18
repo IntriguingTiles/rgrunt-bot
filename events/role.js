@@ -109,7 +109,7 @@ async function roleUpdate(oldRole, newRole) {
         embed.setFooter(`ID: ${newRole.id}`);
         embed.setTimestamp();
 
-        const msg =newRole.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await newRole.guild.channels.cache.get(guildSettings.logChannel).send(embed);
 
         if (newRole.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
             await sleep(800);
