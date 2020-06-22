@@ -143,7 +143,7 @@ client.regenWordRegex = guildID => {
             regex += `[${lookalikes[badWord.toLowerCase().charAt(i)] ? lookalikes[badWord.toLowerCase().charAt(i)] : badWord.charAt(i)}]`;
         }
 
-        client.badWords.get(guildID).push(new RegExp(regex, "i"));
+        client.badWords.get(guildID).push(new RegExp(regex, "iu"));
     });
 };
 
@@ -171,7 +171,7 @@ client.regenNameRegex = guildID => {
             regex += `[${lookalikes[badName[0].toLowerCase().charAt(i)] ? lookalikes[badName[0].toLowerCase().charAt(i)] : badName[0].charAt(i)}]`;
         }
 
-        client.badNames.get(guildID).push([new RegExp(regex, "ig"), badName[1]]);
+        client.badNames.get(guildID).push([new RegExp(regex, "igu"), badName[1]]);
     });
 };
 
