@@ -35,7 +35,7 @@ async function roleCreate(role) {
     if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && role.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Role Created", role.guild.iconURL());
+        embed.setAuthor("Role Created", role.guild.iconURL({ dynamic: true }));
         embed.setColor(colors.GREEN);
         embed.addField("Name", role.name, true);
         embed.addField("Permissions", `\`${role.permissions.bitfield}\``, true);
@@ -73,7 +73,7 @@ async function roleUpdate(oldRole, newRole) {
         const embed = new MessageEmbed();
         let shouldPost = false;
 
-        embed.setAuthor("Role Updated", newRole.guild.iconURL());
+        embed.setAuthor("Role Updated", newRole.guild.iconURL({ dynamic: true }));
         embed.setColor(colors.BLUE);
 
         if (oldRole.name !== newRole.name) {
@@ -137,7 +137,7 @@ async function roleDelete(role) {
     if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && role.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Role Deleted", role.guild.iconURL());
+        embed.setAuthor("Role Deleted", role.guild.iconURL({ dynamic: true }));
         embed.setColor(colors.ORANGE);
         embed.addField("Name", role.name, true);
         embed.setFooter(`ID: ${role.id}`);

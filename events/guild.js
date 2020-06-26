@@ -34,7 +34,7 @@ async function guildUpdate(oldGuild, newGuild) {
         const embed = new MessageEmbed();
         let shouldPost = false;
 
-        embed.setAuthor("Server Updated", newGuild.iconURL());
+        embed.setAuthor("Server Updated", newGuild.iconURL({ dynamic: true }));
         embed.setColor(colors.BLUE);
 
         if (oldGuild.name !== newGuild.name) {

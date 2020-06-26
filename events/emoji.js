@@ -35,7 +35,7 @@ async function emojiCreate(emoji) {
     if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Emoji Created", emoji.guild.iconURL());
+        embed.setAuthor("Emoji Created", emoji.guild.iconURL({ dynamic: true }));
         embed.setColor(colors.GREEN);
         embed.addField("Name", emoji.name, true);
         embed.setThumbnail(emoji.url);
@@ -74,7 +74,7 @@ async function emojiUpdate(oldEmoji, newEmoji) {
     if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && newEmoji.guild.channels.cache.has(guildSettings.logChannel) && oldEmoji.name !== newEmoji.name) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Emoji Updated", newEmoji.guild.iconURL());
+        embed.setAuthor("Emoji Updated", newEmoji.guild.iconURL({ dynamic: true }));
         embed.setColor(colors.BLUE);
         embed.addField("Name", `\`${oldEmoji.name}\` → \`${newEmoji.name}\``, true);
         embed.setThumbnail(newEmoji.url);
@@ -108,7 +108,7 @@ async function emojiDelete(emoji) {
     if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Emoji Deleted", emoji.guild.iconURL());
+        embed.setAuthor("Emoji Deleted", emoji.guild.iconURL({ dynamic: true }));
         embed.setColor(colors.ORANGE);
         embed.addField("Name", emoji.name, true);
         embed.setThumbnail(emoji.url);
