@@ -43,11 +43,7 @@ async function guildMemberAdd(member) {
         const embed = new MessageEmbed();
 
         embed.setAuthor("Member Joined", member.user.displayAvatarURL({ dynamic: true }));
-
-        if (moment.duration(moment().diff(member.user.createdTimestamp)).months() < 1 && moment.duration(moment().diff(member.user.createdTimestamp)).years() === 0) {
-            embed.addField("New Account", `Created ${moment(member.user.createdTimestamp).fromNow()}`);
-        }
-
+        embed.addField("Account Created", `${moment(member.user.createdTimestamp).fromNow()}`);
         embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.GREEN);
         embed.setDescription(`${member.user} ${member.user.tag}`);
@@ -104,7 +100,7 @@ async function guildMemberUpdate(oldMember, newMember) {
         }
 
         if (!shouldPost) return;
-        
+
         embed.setFooter(`ID: ${newMember.id}`);
         embed.setTimestamp();
 
