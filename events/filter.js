@@ -39,7 +39,7 @@ async function message(msg) {
     const badWords = client.badWords.get(msg.guild.id);
 
     badWords.forEach(word => {
-        if (msg.content.replace(/[\u200e\u200b]/g, "").match(word)) {
+        if (msg.content.replace(/[\u200e\u200b*_~]/g, "").match(word)) {
             msg.delete();
             msg.badWords = true;
         }
@@ -62,7 +62,7 @@ async function messageUpdate(oldMsg, newMsg) {
     const badWords = client.badWords.get(newMsg.guild.id);
 
     badWords.forEach(word => {
-        if (newMsg.content.match(word)) {
+        if (newMsg.content.replace(/[\u200e\u200b*_~]/g, "").match(word)) {
             newMsg.delete();
             newMsg.badWords = true;
         }
