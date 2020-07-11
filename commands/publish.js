@@ -10,9 +10,13 @@ exports.requireMod = true;
 exports.run = async (client, msg) => {
     if (msg.guild.id !== "154305477323390976") return;
 
-    if (!msg.guild.channels.cache.get("600155691428216835").lastMessage) {
-        (await msg.guild.channels.cache.get("600155691428216835").messages.fetch({ limit: 1 })).first().crosspost();
-    } else msg.guild.channels.cache.get("600155691428216835").lastMessage.crosspost();
-    
+    try {
+        if (!msg.guild.channels.cache.get("600155691428216835").lastMessage) {
+            await (await msg.guild.channels.cache.get("600155691428216835").messages.fetch({ limit: 1 })).first().crosspost();
+        } else await msg.guild.channels.cache.get("600155691428216835").lastMessage.crosspost();
+    } catch (err) {
+        return msg.channel.send("Failed to publish.");
+    }
+        
     msg.channel.send("Published.");
 };
