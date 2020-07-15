@@ -58,6 +58,7 @@ client.on("message", async msg => {
     if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
 
     const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
+    if (!msg.content.startsWith(guildSettings.prefix)) return;
     const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
 
     if (!(cmd in client.commands)) return;
