@@ -21,7 +21,8 @@ const defaultSettings = {
     modRoles: [],
     logFlags: 0,
     badWords: [],
-    badNames: []
+    badNames: [],
+    antiSpam: false
 };
 
 process.on("unhandledRejection", err => {
