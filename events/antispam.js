@@ -28,7 +28,7 @@ async function message(msg) {
     if (!msg.member.manageable) return;
     if (msg.member.hasPermission("MANAGE_GUILD")) return;
     if (!msg.guild.me.hasPermission("MANAGE_ROLES")) return;
-    if (msg.mentions.members.size < 5) return;
+    if (msg.mentions.members.filter(member => !member.user.bot).size < 5) return;
     if (client.guildSettings.get(msg.guild.id).antiSpam)
     if (!client.guildSettings.get(msg.guild.id).jailRole) return;
     if (!msg.guild.roles.cache.has(client.guildSettings.get(msg.guild.id).jailRole)) return;
