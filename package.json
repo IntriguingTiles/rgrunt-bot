@@ -17,19 +17,18 @@
   },
   "homepage": "https://github.com/IntriguingTiles/rgrunt-bot#readme",
   "dependencies": {
-    "better-sqlite3": "^7.1.0",
-    "bufferutil": "^4.0.1",
-    "discord.js": "github:IntriguingTiles/discord.js#stable",
+    "better-sqlite3": "^7.1.1",
+    "bufferutil": "^4.0.2",
+    "discord.js": "^12.5.0",
     "dotenv": "^8.2.0",
-    "enmap": "^5.3.1",
+    "enmap": "^5.8.2",
     "erlpack": "github:discordapp/erlpack",
     "express": "^4.17.1",
-    "moment": "^2.26.0",
-    "snoostream": "github:asundheim/snoostream",
-    "utf-8-validate": "^5.0.2",
+    "moment": "^2.29.1",
+    "utf-8-validate": "^5.0.3",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
-    "eslint": "^7.2.0"
+    "eslint": "^7.15.0"
   }
 }
