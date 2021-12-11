@@ -12,6 +12,7 @@ exports.requireMod = true;
  * @param {Client} client
  * @param {Message} msg
  * @param {string[]} args
+ * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, msg, args, guildSettings) => {
     const prefix = guildSettings.prefix;

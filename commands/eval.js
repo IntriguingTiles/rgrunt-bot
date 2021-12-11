@@ -7,6 +7,7 @@ const { Client, Message } = require("discord.js");
  * @param {Client} client
  * @param {Message} msg
  * @param {string[]} args
+ * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, msg, args, guildSettings) => {
     if (msg.author.id !== "221017760111656961") return;

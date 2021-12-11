@@ -12,6 +12,7 @@ exports.requireMod = true;
  * @param {Client} client
  * @param {Message} msg
  * @param {string[]} args
+ * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, msg, args, guildSettings) => {
     if (!guildSettings.verifyRole) return msg.channel.send(`Use \`${guildSettings.prefix}roleconfig verify\` before using this command.`);
@@ -29,7 +30,8 @@ exports.run = async (client, msg, args, guildSettings) => {
 /**
  * @param {Client} client 
  * @param {Message} msg 
- * @param {String[]} args
+ * @param {string[]} args
+ * @param {import("../types").Settings} guildSettings
  * @returns {GuildMember}
  */
 async function fetchMember(client, msg, args) {
