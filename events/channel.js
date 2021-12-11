@@ -104,7 +104,7 @@ async function channelUpdate(oldCh, newCh) {
                 const log = logs.entries.first();
 
                 if (Date.now() - log.createdTimestamp < 1400) {
-                    embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
+                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
                     msg.edit(embed);
