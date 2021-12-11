@@ -19,7 +19,7 @@ exports.requireMod = true;
 exports.run = async (client, msg, args, guildSettings) => {
     if (!guildSettings.jailRole) return msg.channel.send(`Use \`${guildSettings.prefix}roleconfig jail\` before using this command.`);
     if (!msg.guild.roles.cache.has(guildSettings.jailRole)) return msg.channel.send("The role used for jail no longer exists.");
-    if (args.length === 0) return msg.channel.send(`${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+    if (args.length === 0) return msg.channel.send(`\`${guildSettings.prefix}${exports.help.usage}\``);
 
     try {
         const member = await fetchMember(client, msg, args);

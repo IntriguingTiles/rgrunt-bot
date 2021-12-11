@@ -7,7 +7,18 @@ const lookalikes = require("./utils/lookalikes.js");
 
 const server = express();
 
-const client = new Discord.Client({ disableMentions: "everyone", partials: ["MESSAGE"] });
+const client = new Discord.Client({
+    intents: [
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_MEMBERS,
+        Discord.Intents.FLAGS.GUILD_BANS,
+        Discord.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+        Discord.Intents.FLAGS.GUILD_MESSAGES,
+        Discord.Intents.FLAGS.GUILD_PRESENCES
+    ],
+    partials: ["MESSAGE"]
+});
+
 client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: true, ensureProps: true });
 client.badWords = new Discord.Collection();
 client.badNames = new Discord.Collection();
@@ -53,9 +64,10 @@ client.on("guildDelete", async guild => {
     client.guildSettings.delete(guild.id);
 });
 
-client.on("message", async msg => {
+client.on("messageCreate", async msg => {
+    if (msg.partial) return;
     if (msg.author.bot) return;
-    if (msg.channel.type === "dm") return;
+    if (msg.channel.type === "DM") return;
     if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
 
     const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
@@ -65,11 +77,11 @@ client.on("message", async msg => {
     if (!(cmd in client.commands)) return;
 
     if (client.commands[cmd].requireAdmin) {
-        if (!msg.member.hasPermission("MANAGE_GUILD") && msg.author.id !== "221017760111656961") return;
+        if (!msg.member.permissions.has("MANAGE_GUILD") && msg.author.id !== "221017760111656961") return;
     }
 
     if (client.commands[cmd].requireMod) {
-        if (!msg.member.hasPermission("MANAGE_GUILD") && msg.author.id !== "221017760111656961") {
+        if (!msg.member.permissions.has("MANAGE_GUILD") && msg.author.id !== "221017760111656961") {
             let hasPerms = false;
 
             guildSettings.modRoles.forEach(role => {

@@ -15,8 +15,8 @@ exports.requireAdmin = true;
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length === 0) return msg.channel.send(`${guildSettings.prefix}${exports.help.usage}`, { code: "" });
-    if (!msg.guild.me.hasPermission("MANAGE_NICKNAMES")) return msg.channel.send("I need the \"Manage Nicknames\" permission in order to filter (nick)names!");
+    if (args.length === 0) return msg.channel.send(`\`${guildSettings.prefix}${exports.help.usage}\``);
+    if (!msg.guild.me.permissions.has("MANAGE_NICKNAMES")) return msg.channel.send("I need the \"Manage Nicknames\" permission in order to filter (nick)names!");
 
     switch (args[0]) {
         case "add": {

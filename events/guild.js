@@ -52,17 +52,18 @@ async function guildUpdate(oldGuild, newGuild) {
         embed.setFooter(`ID: ${newGuild.id}`);
         embed.setTimestamp();
 
-        const msg = await newGuild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await newGuild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (newGuild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (newGuild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await newGuild.fetchAuditLogs({ type: "GUILD_UPDATE", limit: 1 });
             if (logs.entries.first()) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }

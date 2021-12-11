@@ -16,7 +16,7 @@ exports.requireAdmin = true;
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length === 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+    if (args.length === 0) return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
 
     switch (args[0]) {
         case "enable":
@@ -93,7 +93,7 @@ exports.run = async (client, msg, args, guildSettings) => {
             const ch = msg.guild.channels.cache.get(channelID);
 
             if (!ch) return msg.channel.send("Channel not found.");
-            if (ch.type !== "text") return msg.channel.send("Not a text channel.");
+            if (ch.type !== "GUILD_TEXT") return msg.channel.send("Not a text channel.");
             if (!ch.permissionsFor(client.user).has("SEND_MESSAGES")) return msg.channel.send(`I don't have permission to send messages in ${ch}.`);
             if (!ch.permissionsFor(client.user).has("EMBED_LINKS")) return msg.channel.send(`I don't have permission to send embeds in ${ch}.`);
 
@@ -104,7 +104,7 @@ exports.run = async (client, msg, args, guildSettings) => {
             break;
         }
         default:
-            msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+            msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
             break;
     }
 };

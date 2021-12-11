@@ -17,7 +17,7 @@ exports.requireMod = true;
 exports.run = async (client, msg, args, guildSettings) => {
     if (!guildSettings.verifyRole) return msg.channel.send(`Use \`${guildSettings.prefix}roleconfig verify\` before using this command.`);
     if (!msg.guild.roles.cache.has(guildSettings.verifyRole)) return msg.channel.send("The role used for verify no longer exists.");
-    if (args.length === 0) return msg.channel.send(`${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+    if (args.length === 0) return msg.channel.send(`\`${guildSettings.prefix}${exports.help.usage}\``);
 
     try {
         (await fetchMember(client, msg, args)).roles.add(guildSettings.verifyRole, `Verified by ${msg.author.tag}`);

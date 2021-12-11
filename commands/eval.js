@@ -19,7 +19,7 @@ exports.run = async (client, msg, args, guildSettings) => {
         if (typeof evaled !== "string")
             evaled = require("util").inspect(evaled);
 
-        msg.channel.send(clean(evaled), { code: "xl" }).catch(err => msg.channel.send("Result too big to send."));
+        msg.channel.send(`\`\`\`${clean(evaled)}\`\`\``).catch(err => msg.channel.send("Result too big to send."));
     } catch (err) {
         msg.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
     }

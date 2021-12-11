@@ -8,7 +8,7 @@ let client;
  */
 exports.register = c => {
     client = c;
-    c.on("message", message);
+    c.on("messageCreate", messageCreate);
     c.on("messageUpdate", messageUpdate);
     c.on("guildMemberAdd", guildMemberAdd);
     c.on("guildMemberUpdate", guildMemberUpdate);
@@ -18,7 +18,7 @@ exports.register = c => {
  * @param {Client} c
  */
 exports.deregister = c => {
-    c.removeListener("message", message);
+    c.removeListener("messageCreate", messageCreate);
     c.removeListener("messageUpdate", messageUpdate);
     c.removeListener("guildMemberAdd", guildMemberAdd);
     c.removeListener("guildMemberUpdate", guildMemberUpdate);
@@ -27,13 +27,13 @@ exports.deregister = c => {
 /**
  * @param {Message} msg 
  */
-async function message(msg) {
+async function messageCreate(msg) {
     if (msg.partial) return;
-    if (msg.channel.type === "dm") return;
+    if (msg.channel.type === "DM") return;
     if (msg.author.bot) return;
     if (msg.content.length === 0) return;
     if (!msg.deletable) return;
-    if (msg.member.hasPermission("MANAGE_GUILD")) return;
+    if (msg.member.permissions.has("MANAGE_GUILD")) return;
     if (!client.badWords.has(msg.guild.id)) return;
 
     const badWords = client.badWords.get(msg.guild.id);
@@ -52,11 +52,11 @@ async function message(msg) {
  */
 async function messageUpdate(oldMsg, newMsg) {
     if (newMsg.partial) return;
-    if (newMsg.channel.type === "dm") return;
+    if (newMsg.channel.type === "DM") return;
     if (newMsg.author.bot) return;
     if (newMsg.content.length === 0) return;
     if (!newMsg.deletable) return;
-    if (newMsg.member.hasPermission("MANAGE_GUILD")) return;
+    if (newMsg.member.permissions.has("MANAGE_GUILD")) return;
     if (!client.badWords.has(newMsg.guild.id)) return;
 
     const badWords = client.badWords.get(newMsg.guild.id);

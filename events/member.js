@@ -1,4 +1,4 @@
-const { Client, GuildMember, MessageEmbed, Guild, User } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, GuildMember, MessageEmbed, Guild, User, GuildBan } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -50,7 +50,7 @@ async function guildMemberAdd(member) {
         embed.setFooter(`ID: ${member.id}`);
         embed.setTimestamp();
 
-        member.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        member.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
     }
 }
 
@@ -59,6 +59,7 @@ async function guildMemberAdd(member) {
  * @param {GuildMember} newMember 
  */
 async function guildMemberUpdate(oldMember, newMember) {
+    /** @type {import("../types").Settings} */
     const guildSettings = client.guildSettings.get(newMember.guild.id);
 
     if (guildSettings.logFlags & flags.logs.USER && guildSettings.logChannel && newMember.guild.channels.cache.has(guildSettings.logChannel)) {
@@ -104,17 +105,18 @@ async function guildMemberUpdate(oldMember, newMember) {
         embed.setFooter(`ID: ${newMember.id}`);
         embed.setTimestamp();
 
-        const msg = await newMember.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await newMember.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (newMember.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (newMember.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await newMember.guild.fetchAuditLogs({ limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newMember.id && logs.entries.first().executor.id !== newMember.id) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }
@@ -140,7 +142,7 @@ async function guildMemberRemove(member) {
         embed.setFooter(`ID: ${member.id}`);
         embed.setTimestamp();
 
-        member.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        member.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
     }
 }
 
@@ -150,7 +152,8 @@ async function guildMemberRemove(member) {
 async function guildMemberKick(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) && member.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) && member.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        const timestamp = Date.now();
         await sleep(900);
         await member.user.fetch();
 
@@ -162,7 +165,7 @@ async function guildMemberKick(member) {
         embed.setColor(colors.ORANGE);
         embed.addField("Member", `${member.user} ${member.user.tag}`, true);
 
-        if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Date.now() - logs.entries.first().createdAt < 1500) {
+        if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Math.abs(timestamp - logs.entries.first().createdTimestamp) < 1400) {
             const log = logs.entries.first();
             embed.addField("Kicked by", `${log.executor} ${log.executor.tag}`, true);
             if (log.reason) embed.addField("Reason", log.reason);
@@ -173,15 +176,16 @@ async function guildMemberKick(member) {
         embed.setFooter(`ID: ${member.user.id}`);
         embed.setTimestamp();
 
-        member.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        member.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
     }
 }
 
 /**
- * @param {Guild} guild 
- * @param {User} user 
+ * @param {GuildBan} ban 
  */
-async function guildBanAdd(guild, user) {
+async function guildBanAdd(ban) {
+    const guild = ban.guild;
+    const user = ban.user;
     const guildSettings = client.guildSettings.get(guild.id);
 
     if (guildSettings.logFlags & flags.logs.BAN && guildSettings.logChannel && guild.channels.cache.has(guildSettings.logChannel)) {
@@ -196,17 +200,18 @@ async function guildBanAdd(guild, user) {
         embed.setFooter(`ID: ${user.id}`);
         embed.setTimestamp();
 
-        const msg = await guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(900);
             const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_ADD", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 1500) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Banned by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }
@@ -214,10 +219,11 @@ async function guildBanAdd(guild, user) {
 }
 
 /**
- * @param {Guild} guild 
- * @param {User} user 
+ * @param {GuildBan} ban
  */
-async function guildBanRemove(guild, user) {
+async function guildBanRemove(ban) {
+    const guild = ban.guild;
+    const user = ban.user;
     const guildSettings = client.guildSettings.get(guild.id);
 
     if (guildSettings.logFlags & flags.logs.BAN && guildSettings.logChannel && guild.channels.cache.has(guildSettings.logChannel)) {
@@ -233,17 +239,18 @@ async function guildBanRemove(guild, user) {
         embed.setFooter(`ID: ${user.id}`);
         embed.setTimestamp();
 
-        const msg = await guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_REMOVE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Unbanned by", `${log.executor} ${log.executor.tag}`, true);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }

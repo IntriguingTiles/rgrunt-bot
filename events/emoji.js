@@ -42,21 +42,22 @@ async function emojiCreate(emoji) {
         embed.setFooter(`ID: ${emoji.id}`);
         embed.setTimestamp();
 
-        if (!emoji.guild.me.hasPermission("VIEW_AUDIT_LOG")) embed.addField("Created by", `${await emoji.fetchAuthor()} ${await emoji.fetchAuthor().tag}`);
+        if (!emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) embed.addField("Created by", `${await emoji.fetchAuthor()} ${await emoji.fetchAuthor().tag}`);
 
-        const msg = await emoji.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await emoji.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (emoji.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await emoji.guild.fetchAuditLogs({ type: "EMOJI_CREATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === emoji.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }
@@ -81,13 +82,14 @@ async function emojiUpdate(oldEmoji, newEmoji) {
         embed.setFooter(`ID: ${newEmoji.id}`);
         embed.setTimestamp();
 
-        if (newEmoji.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (newEmoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await newEmoji.guild.fetchAuditLogs({ type: "EMOJI_UPDATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newEmoji.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -95,7 +97,7 @@ async function emojiUpdate(oldEmoji, newEmoji) {
             }
         }
 
-        newEmoji.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        newEmoji.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
     }
 }
 
@@ -115,13 +117,14 @@ async function emojiDelete(emoji) {
         embed.setFooter(`ID: ${emoji.id}`);
         embed.setTimestamp();
 
-        if (emoji.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await emoji.guild.fetchAuditLogs({ type: "EMOJI_DELETE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === emoji.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
@@ -129,6 +132,6 @@ async function emojiDelete(emoji) {
             }
         }
 
-        emoji.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        emoji.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
     }
 }

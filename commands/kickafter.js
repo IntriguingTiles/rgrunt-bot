@@ -16,8 +16,8 @@ exports.requireAdmin = true;
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length === 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
-    if (!msg.guild.me.hasPermission("KICK_MEMBERS")) return msg.channel.send("I don't have permission to kick members.");
+    if (args.length === 0) return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
+    if (!msg.guild.me.permissions.has("KICK_MEMBERS")) return msg.channel.send("I don't have permission to kick members.");
 
     try {
         const member = await fetchMember(client, msg, args);

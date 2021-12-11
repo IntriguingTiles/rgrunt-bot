@@ -15,7 +15,7 @@ exports.requireAdmin = true;
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length === 0) return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+    if (args.length === 0) return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
 
     switch (args[0]) {
         case "mods":
@@ -107,6 +107,6 @@ exports.run = async (client, msg, args, guildSettings) => {
             }
             break;
         default:
-            return msg.channel.send(`Usage: ${guildSettings.prefix}${exports.help.usage}`, { code: "" });
+            return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
     }
 };

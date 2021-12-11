@@ -29,7 +29,7 @@ exports.deregister = c => {
  * @param {Message} msg
  */
 async function messageDelete(msg) {
-    if (msg.channel.type === "dm") return;
+    if (msg.channel.type === "DM") return;
 
     const guildSettings = client.guildSettings.get(msg.guild.id);
 
@@ -69,18 +69,19 @@ async function messageDelete(msg) {
         if (msg.badWords) {
             embed.addField("Deleted by", `${client.user} ${client.user.tag}`);
             embed.addField("Reason", "Word filter");
-            msg.guild.channels.cache.get(guildSettings.logChannel).send(embed);
-        } else if (msg.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
-            const logMsg = await msg.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+            msg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
+        } else if (msg.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const logMsg = await msg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await msg.guild.fetchAuditLogs({ type: "MESSAGE_DELETE", limit: 1 });
             if (logs.entries.first()) {
                 const log = logs.entries.first();
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    logMsg.edit(embed);
+                    logMsg.edit({ embeds: [embed] });
                 }
             }
         }
@@ -92,7 +93,7 @@ async function messageDelete(msg) {
  * @param {Message} newMsg 
  */
 async function messageUpdate(oldMsg, newMsg) {
-    if (newMsg.channel.type === "dm") return;
+    if (newMsg.channel.type === "DM") return;
 
     const guildSettings = client.guildSettings.get(newMsg.guild.id);
 
@@ -117,6 +118,6 @@ async function messageUpdate(oldMsg, newMsg) {
         embed.setFooter(`ID: ${newMsg.id}`);
         embed.setTimestamp();
 
-        newMsg.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        newMsg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
     }
 }

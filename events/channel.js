@@ -30,7 +30,7 @@ exports.deregister = c => {
  * @param {GuildChannel} ch 
  */
 async function channelCreate(ch) {
-    if (ch.type === "dm") return;
+    if (ch.type === "DM") return;
     const guildSettings = client.guildSettings.get(ch.guild.id);
 
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
@@ -42,19 +42,20 @@ async function channelCreate(ch) {
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();
 
-        const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (ch.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (ch.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await ch.guild.fetchAuditLogs({ type: "CHANNEL_CREATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }
@@ -67,7 +68,7 @@ async function channelCreate(ch) {
  * @param {GuildChannel} newCh 
  */
 async function channelUpdate(oldCh, newCh) {
-    if (newCh.type === "dm") return;
+    if (newCh.type === "DM") return;
     const guildSettings = client.guildSettings.get(newCh.guild.id);
 
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && newCh.guild.channels.cache.has(guildSettings.logChannel)) {
@@ -95,19 +96,20 @@ async function channelUpdate(oldCh, newCh) {
         embed.setFooter(`ID: ${newCh.id}`);
         embed.setTimestamp();
 
-        const msg = await newCh.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await newCh.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (newCh.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (newCh.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await newCh.guild.fetchAuditLogs({ type: "CHANNEL_UPDATE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newCh.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }
@@ -119,7 +121,7 @@ async function channelUpdate(oldCh, newCh) {
  * @param {GuildChannel} ch 
  */
 async function channelDelete(ch) {
-    if (ch.type === "dm") return;
+    if (ch.type === "DM") return;
     const guildSettings = client.guildSettings.get(ch.guild.id);
 
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
@@ -131,19 +133,20 @@ async function channelDelete(ch) {
         embed.setFooter(`ID: ${ch.id}`);
         embed.setTimestamp();
 
-        const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send(embed);
+        const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (ch.guild.me.hasPermission("VIEW_AUDIT_LOG")) {
+        if (ch.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+            const timestamp = Date.now();
             await sleep(800);
             const logs = await ch.guild.fetchAuditLogs({ type: "CHANNEL_DELETE", limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
-                if (Date.now() - log.createdTimestamp < 1400) {
+                if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
                     embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
                     embed.setTimestamp(log.createdAt);
                     if (log.reason) embed.addField("Reason", log.reason);
-                    msg.edit(embed);
+                    msg.edit({ embeds: [embed] });
                 }
             }
         }
