@@ -1,11 +1,8 @@
 require("dotenv").config();
 const Discord = require("discord.js");
 const Enmap = require("enmap");
-const express = require("express");
 const fs = require("fs");
 const lookalikes = require("./utils/lookalikes.js");
-
-const server = express();
 
 const client = new Discord.Client({
     intents: [
@@ -188,16 +185,3 @@ client.regenNameRegex = guildID => {
         client.badNames.get(guildID).push([new RegExp(regex, "igu"), badName[1]]);
     });
 };
-
-// very ugly express inline html stuff below
-server.get("/", (req, res) => {
-    let final = `<h1>RGrunt Stats</h1>
-<p>Watching ${client.guilds.cache.size} servers with ${client.users.cache.size} users.<br>
-<h2>Server List</h2>\n<pre>`;
-    client.guilds.cache.sort((a, b) => {
-        return b.memberCount - a.memberCount;
-    }).forEach(guild => final += `${guild.name} owned by ${guild.owner.user.tag} (${guild.memberCount} members)\n`);
-    res.send(final + "</pre>");
-});
-
-server.listen(1340, () => console.log("Started web server on port 1340!"));
