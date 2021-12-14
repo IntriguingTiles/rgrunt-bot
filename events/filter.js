@@ -1,4 +1,5 @@
 const { Client, Message, GuildMember } = require("discord.js"); // eslint-disable-line no-unused-vars
+require("re2");
 
 /** @type {Client} */
 let client;

@@ -26,6 +26,7 @@
     "enmap": "^5.8.2",
     "erlpack": "github:discordapp/erlpack",
     "moment": "^2.29.1",
+    "re2": "^1.17.1",
     "utf-8-validate": "^5.0.3",
     "zlib-sync": "^0.1.7"
   },
