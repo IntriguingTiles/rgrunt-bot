@@ -40,7 +40,7 @@ async function messageCreate(msg) {
 
     badWords.forEach(word => {
         if (msg.content.replace(/[\u200e\u200b*_~]/g, "").match(word)) {
-            msg.delete();
+            msg.delete().catch(() => {});
             msg.badWords = true;
         }
     });
@@ -63,7 +63,7 @@ async function messageUpdate(oldMsg, newMsg) {
 
     badWords.forEach(word => {
         if (newMsg.content.replace(/[\u200e\u200b*_~]/g, "").match(word)) {
-            newMsg.delete();
+            newMsg.delete().catch(() => {});
             newMsg.badWords = true;
         }
     });
