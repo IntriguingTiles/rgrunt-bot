@@ -1,4 +1,4 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, Message, GuildMember } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.help = {
     name: "verify",
@@ -17,10 +17,11 @@ exports.requireMod = true;
 exports.run = async (client, msg, args, guildSettings) => {
     if (!guildSettings.verifyRole) return msg.channel.send(`Use \`${guildSettings.prefix}roleconfig verify\` before using this command.`);
     if (!msg.guild.roles.cache.has(guildSettings.verifyRole)) return msg.channel.send("The role used for verify no longer exists.");
+    if (!msg.guild.me.permissions.has("MANAGE_ROLES")) return msg.channel.send("I don't have permission to manage roles.");
     if (args.length === 0) return msg.channel.send(`\`${guildSettings.prefix}${exports.help.usage}\``);
 
     try {
-        (await fetchMember(client, msg, args)).roles.add(guildSettings.verifyRole, `Verified by ${msg.author.tag}`);
+        await (await fetchMember(client, msg, args)).roles.add(guildSettings.verifyRole, `Verified by ${msg.author.tag}`);
         msg.channel.send("Verified!");
     } catch (err) {
         msg.channel.send("Failed to add the verified role!");
