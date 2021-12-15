@@ -1,4 +1,4 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, Message, GuildMember } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 exports.aliases = ["unjail"];
 
@@ -19,15 +19,16 @@ exports.requireMod = true;
 exports.run = async (client, msg, args, guildSettings) => {
     if (!guildSettings.jailRole) return msg.channel.send(`Use \`${guildSettings.prefix}roleconfig jail\` before using this command.`);
     if (!msg.guild.roles.cache.has(guildSettings.jailRole)) return msg.channel.send("The role used for jail no longer exists.");
+    if (!msg.guild.me.permissions.has("MANAGE_ROLES")) return msg.channel.send("I don't have permission to manage roles.");
     if (args.length === 0) return msg.channel.send(`\`${guildSettings.prefix}${exports.help.usage}\``);
 
     try {
         const member = await fetchMember(client, msg, args);
         if (member.roles.cache.has(guildSettings.jailRole)) {
-            member.roles.remove(guildSettings.jailRole, `Unjailed by ${msg.author.tag}`);
+            await member.roles.remove(guildSettings.jailRole, `Unjailed by ${msg.author.tag}`);
             msg.channel.send("Unjailed!");
         } else {
-            member.roles.add(guildSettings.jailRole, `Jailed by ${msg.author.tag}`);
+            await member.roles.add(guildSettings.jailRole, `Jailed by ${msg.author.tag}`);
             msg.channel.send("Jailed!");
         }
     } catch (err) {
