@@ -27,13 +27,18 @@ exports.run = async (client, msg, args, guildSettings) => {
         if (member.roles.cache.has(guildSettings.jailRole)) {
             await member.roles.remove(guildSettings.jailRole, `Unjailed by ${msg.author.tag}`);
             msg.channel.send("Unjailed!");
+            const index = guildSettings.jailedUsers.indexOf(member.id);
+            if (index > -1) guildSettings.jailedUsers.splice(index, 1);
         } else {
             await member.roles.add(guildSettings.jailRole, `Jailed by ${msg.author.tag}`);
             msg.channel.send("Jailed!");
+            guildSettings.jailedUsers.push(member.id);
         }
     } catch (err) {
         msg.channel.send("Failed to add/remove the jail role!");
     }
+
+    client.guildSettings.set(msg.guild.id, guildSettings);
 };
 
 /**

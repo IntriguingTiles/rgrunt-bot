@@ -7,5 +7,6 @@ export type Settings = {
     logFlags: number,
     badWords: string[],
     badNames: string[][],
-    antiSpam: boolean
+    antiSpam: boolean,
+    jailedUsers: string[]
 };

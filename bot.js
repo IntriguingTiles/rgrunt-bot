@@ -31,7 +31,8 @@ const defaultSettings = {
     logFlags: 0,
     badWords: [],
     badNames: [],
-    antiSpam: false
+    antiSpam: false,
+    jailedUsers: []
 };
 
 process.on("unhandledRejection", err => {
