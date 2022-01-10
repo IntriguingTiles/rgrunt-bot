@@ -31,7 +31,7 @@ exports.run = async (client, intr, guildSettings) => {
     if (!intr.guild.me.permissions.has("MANAGE_ROLES")) return intr.reply({ content: "I don't have permission to manage roles.", ephemeral: true });
 
     try {
-        const member = intr.options.getMember("user", true);
+        const member = intr.options.getMember("user");
         if (member.roles.cache.has(guildSettings.jailRole)) {
             await member.roles.remove(guildSettings.jailRole, `Unjailed by ${intr.user.tag}`);
             intr.reply("Unjailed.");
