@@ -28,8 +28,8 @@ exports.run = async (client, intr, guildSettings) => {
     if (!intr.guild.me.permissions.has("MANAGE_ROLES")) return intr.reply({ content: "I don't have permission to manage roles.", ephemeral: true });
 
     try {
-        await intr.options.getMember("user", true).roles.add(guildSettings.verifyRole, `Verified by ${intr.user.tag}`);
-        intr.reply("Verified!");
+        await intr.options.getMember("user").roles.add(guildSettings.verifyRole, `Verified by ${intr.user.tag}`);
+        intr.reply(`Verified ${intr.options.getMember("user")}.`);
     } catch (err) {
         console.log(err);
         intr.reply({ content: "Failed to add the verified role!", ephemeral: true });
