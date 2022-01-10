@@ -1,66 +1,114 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 const flags = require("../utils/flags.js");
 
-exports.help = {
-    name: "logs",
-    usage: "logs <enable|disable|list|channel> [args]",
-    info: "Sets the logging settings"
-};
+const choices = [["All - All log types.", "all"]];
+
+// dynamically build the log choices
+for (let i = 0; i < flags.logs.TOTAL; i++) {
+    const str = flags.logsStrings(1 << i);
+    const name = str.split(" - ")[0];
+    const desc = str.split(" - ")[1];
+    choices.push([`${name.slice(0, 1).toUpperCase()}${name.slice(1)} - ${desc.slice(0, 1).toUpperCase()}${desc.slice(1)}.`, name]);
+}
+
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("logs")
+        .setDescription("Configures the logging feature.")
+        .addSubcommand(cmd =>
+            cmd.setName("enable")
+                .setDescription("Enables a log type.")
+                .addStringOption(option =>
+                    option.setName("type")
+                        .setDescription("The log type to enable.")
+                        .addChoices(choices)
+                        .setRequired(true)))
+        .addSubcommand(cmd =>
+            cmd.setName("disable")
+                .setDescription("Disable a log type.")
+                .addStringOption(option =>
+                    option.setName("type")
+                        .setDescription("The log type to disable.")
+                        .addChoices(choices)
+                        .setRequired(true)))
+        .addSubcommand(cmd =>
+            cmd.setName("show")
+                .setDescription("View the currently enabled/disabled log types."))
+        .addSubcommandGroup(cmdGroup =>
+            cmdGroup.setName("channel")
+                .setDescription("Manage the channel RGrunt will log to.")
+                .addSubcommand(cmd =>
+                    cmd.setName("set")
+                        .setDescription("Sets the channel used for logs.")
+                        .addChannelOption(option =>
+                            option.setName("channel")
+                                .setDescription("The channel to log to.")
+                                .setRequired(true)))
+                .addSubcommand(cmd =>
+                    cmd.setName("clear")
+                        .setDescription("Unsets the logging channel.")))
+];
 
 exports.requireAdmin = true;
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {CommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
-exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length === 0) return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
+exports.run = async (client, intr, guildSettings) => {
+    switch (intr.options.getSubcommandGroup(false) ? intr.options.getSubcommandGroup() : intr.options.getSubcommand()) {
+        case "enable": {
+            if (!guildSettings.logChannel) return intr.reply({ content: "Use `/logs channel` to set the log channel first.", ephemeral: true });
 
-    switch (args[0]) {
-        case "enable":
-            if (args.length !== 2) return msg.channel.send(`\`\`\`Usage: ${guildSettings.prefix}logs enable <log type>\`\`\`\nUse \`${guildSettings.prefix}logs list\` to see the available log types.`);
-            if (!guildSettings.logChannel) return msg.channel.send(`Use \`${guildSettings.prefix}logs channel\` to set the log channel first.`);
+            const type = intr.options.getString("type");
 
-            if (args[1] === "all") {
+            if (type === "all") {
                 for (let i = 0; i < flags.logs.TOTAL; i++) {
                     guildSettings.logFlags |= 1 << i;
                 }
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Enabled all log types.");
+                client.guildSettings.set(intr.guild.id, guildSettings);
+                intr.reply("Enabled all log types.");
                 return;
             }
 
-            if (flags.logs[args[1].toUpperCase()]) {
-                guildSettings.logFlags |= flags.logs[args[1].toUpperCase()];
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Enabled ${flags.logsStrings(flags.logs[args[1].toUpperCase()]).split(" - ")[0]} logs.`);
+            if (flags.logs[type.toUpperCase()]) {
+                guildSettings.logFlags |= flags.logs[type.toUpperCase()];
+                client.guildSettings.set(intr.guild.id, guildSettings);
+                intr.reply(`Enabled ${type} logs.`);
             } else {
-                msg.channel.send(`Log type not found. Use \`${guildSettings.prefix}logs list\` to see the available log types.`);
+                intr.reply({ content: "Log type not found. Use `/logs list` to see the available log types.", ephemeral: true });
             }
 
             break;
-        case "disable":
-            if (args.length !== 2) return msg.channel.send(`\`\`\`Usage: ${guildSettings.prefix}logs disable <log type>\`\`\`\nUse \`${guildSettings.prefix}logs list\` to see the available log types.`);
-            if (!guildSettings.logChannel) return msg.channel.send(`Use \`${guildSettings.prefix}logs channel\` to set the log channel first.`);
+        }
+        case "disable": {
+            if (!guildSettings.logChannel) return intr.reply({ content: "Use `/logs channel` to set the log channel first.", ephemeral: true });
 
-            if (args[1] === "all") {
+            const type = intr.options.getString("type");
+
+            if (type === "all") {
                 guildSettings.logFlags = 0;
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Disabled all log types.");
+                client.guildSettings.set(intr.guild.id, guildSettings);
+                intr.reply("Disabled all log types.");
+                return;
             }
 
-            if (flags.logs[args[1].toUpperCase()]) {
-                guildSettings.logFlags ^= flags.logs[args[1].toUpperCase()];
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Disabled ${flags.logsStrings(flags.logs[args[1].toUpperCase()]).split(" - ")[0]} logs.`);
+            if (flags.logs[type.toUpperCase()]) {
+                if (guildSettings.logFlags & flags.logs[type.toUpperCase()]) {
+                    guildSettings.logFlags ^= flags.logs[type.toUpperCase()];
+                    client.guildSettings.set(intr.guild.id, guildSettings);
+                    intr.reply(`Disabled ${type} logs.`);
+                } else {
+                    intr.reply({ content: "That log type wasn't enabled.", ephemeral: true });
+                }
             } else {
-                msg.channel.send(`Log type not found. Use \`${guildSettings.prefix}logs list\` to see the available log types.`);
+                intr.reply({ content: "Log type not found. Use `/logs list` to see the available log types.", ephemeral: true });
             }
 
             break;
-        case "list": {
+        } case "show": {
             let enabledList = "";
             let availableList = "";
 
@@ -72,39 +120,29 @@ exports.run = async (client, msg, args, guildSettings) => {
                 }
             }
 
-            msg.channel.send(`Enabled log types:\n\`\`\`${enabledList.length !== 0 ? enabledList : "None"}\`\`\`\nAvailable log types:\n\`\`\`${availableList.length !== 0 ? availableList : "None"}\`\`\``);
+            intr.reply({ content: `Logging to: ${guildSettings.logChannel ? `<#${guildSettings.logChannel}>` : "nowhere"}\n\nEnabled log types:\n\`\`\`${enabledList.length !== 0 ? enabledList : "None"}\`\`\`\nAvailable log types:\n\`\`\`${availableList.length !== 0 ? availableList : "None"}\`\`\``, ephemeral: true });
             break;
         }
         case "channel": {
-            if (args.length !== 2) return msg.channel.send(`Usage: ${guildSettings.prefix}logs channel <channel>`, { code: "" });
-
-            if (args[1] === "clear") {
+            if (intr.options.getSubcommand() === "clear") {
                 guildSettings.logChannel = null;
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Successfully cleared the logging channel.");
+                client.guildSettings.set(intr.guild.id, guildSettings);
+                intr.reply("Successfully cleared the logging channel.");
                 return;
             }
 
-            let channelID;
+            const ch = intr.options.getChannel("channel");
 
-            if (msg.mentions.channels.size !== 0) channelID = msg.mentions.channels.first().id;
-            else if (/[0-9]+/g.test(args[1])) channelID = args[1].match(/[0-9]+/g);
+            if (!ch) return intr.reply({ content: "Channel not found.", ephemeral: true });
+            if (ch.type !== "GUILD_TEXT") return intr.reply({ content: "Not a text channel.", ephemeral: true });
+            if (!ch.permissionsFor(client.user).has("SEND_MESSAGES")) return intr.reply({ content: `I don't have permission to send messages in ${ch}.`, ephemeral: true });
+            if (!ch.permissionsFor(client.user).has("EMBED_LINKS")) return intr.reply({ content: `I don't have permission to send embeds in ${ch}.`, ephemeral: true });
 
-            const ch = msg.guild.channels.cache.get(channelID);
+            guildSettings.logChannel = ch.id;
+            client.guildSettings.set(intr.guild.id, guildSettings);
 
-            if (!ch) return msg.channel.send("Channel not found.");
-            if (ch.type !== "GUILD_TEXT") return msg.channel.send("Not a text channel.");
-            if (!ch.permissionsFor(client.user).has("SEND_MESSAGES")) return msg.channel.send(`I don't have permission to send messages in ${ch}.`);
-            if (!ch.permissionsFor(client.user).has("EMBED_LINKS")) return msg.channel.send(`I don't have permission to send embeds in ${ch}.`);
-
-            guildSettings.logChannel = channelID;
-            client.guildSettings.set(msg.guild.id, guildSettings);
-
-            msg.channel.send(`Successfully set the logging channel to ${ch}.`);
+            intr.reply(`Successfully set the logging channel to ${ch}.`);
             break;
         }
-        default:
-            msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
-            break;
     }
 };

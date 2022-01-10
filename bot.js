@@ -47,7 +47,7 @@ client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
     client.loadCommands();
     client.loadEvents();
-    client.user.setActivity(`${defaultSettings.prefix}help`);
+    client.user.setActivity("with slash commands");
 
     client.guilds.cache.forEach(guild => {
         client.regenWordRegex(guild.id);
@@ -91,9 +91,40 @@ client.on("messageCreate", async msg => {
         }
     }
 
-    const args = msg.content.split(" ").slice(1);
+    if (cmd === "eval") {
+        const args = msg.content.split(" ").slice(1);
+        client.commands[cmd].run(client, msg, args, guildSettings);
+    } else {
+        msg.reply({ content: `Text-based commands are no longer supported. Try using \`/${cmd}\`.`, allowedMentions: { repliedUser: false } });
+    }
+});
 
-    client.commands[cmd].run(client, msg, args, guildSettings);
+client.on("interactionCreate", async intr => {
+    if (!intr.isCommand() && !intr.isContextMenu()) return;
+    const cmd = intr.commandName;
+    if (!(cmd in client.commands)) return;
+    if (!intr.inGuild()) return;
+
+    const guildSettings = client.guildSettings.ensure(intr.guild.id, defaultSettings);
+
+    if (client.commands[cmd].requireAdmin) {
+        if (!intr.memberPermissions.has("MANAGE_GUILD") && intr.user.id !== "221017760111656961")
+            return intr.reply({ content: "You do not have permission to use this command.", ephemeral: true });
+    }
+
+    if (client.commands[cmd].requireMod) {
+        if (!intr.memberPermissions.has("MANAGE_GUILD") && intr.user.id !== "221017760111656961") {
+            let hasPerms = false;
+
+            guildSettings.modRoles.forEach(role => {
+                if (intr.member.roles.cache.has(role)) hasPerms = true;
+            });
+
+            if (!hasPerms) return intr.reply({ content: "You do not have permission to use this command.", ephemeral: true });
+        }
+    }
+
+    client.commands[cmd].run(client, intr, guildSettings);
 });
 
 process.on("SIGINT", async () => {
@@ -113,16 +144,28 @@ process.on("message", async msg => {
 client.loadCommands = () => {
     const commands = fs.readdirSync("./commands/");
     client.commands = {};
+
     for (let i = 0; i < commands.length; i++) {
         let cmd = commands[i];
         if (cmd.match(/\.js$/)) {
             delete require.cache[require.resolve(`./commands/${cmd}`)];
-            client.commands[cmd.slice(0, -3)] = require(`./commands/${cmd}`);
-            cmd = client.commands[cmd.slice(0, -3)];
-            if (cmd.aliases) {
-                for (let j = 0; j < cmd.aliases.length; j++) {
-                    client.commands[cmd.aliases[j]] = cmd;
+            cmd = require(`./commands/${cmd}`);
+
+            if (cmd.commands) {
+                for (let j = 0; j < cmd.commands.length; j++) {
+                    client.commands[cmd.commands[j].name] = cmd;
+
+                    if (client.user.id !== "715364254383079455") {
+                        client.guilds.cache.forEach(async guild => {
+                            await client.application.commands.create(cmd.commands[j].toJSON(), guild.id);
+                        });
+                    } else {
+                        client.application.commands.create(cmd.commands[j].toJSON());
+                    }
                 }
+            } else {
+                // eval is the only command without slash command support
+                client.commands["eval"] = cmd;
             }
         }
     }

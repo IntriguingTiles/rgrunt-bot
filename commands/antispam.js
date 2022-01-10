@@ -1,34 +1,35 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "antispam",
-    usage: "antispam <enable|disable>",
-    info: "Enables/disables antispam"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("antispam")
+        .setDescription("Configures the antispam feature.")
+        .addBooleanOption(option =>
+            option.setName("enabled")
+                .setDescription("Whether antispam should be enabled.")
+                .setRequired(true))
+];
 
 exports.requireAdmin = true;
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {CommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
-exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length !== 1) return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
-    if (!guildSettings.jailRole) return msg.channel.send(`Use \`${guildSettings.prefix}roleconfig jail\` before using this command.`);
+exports.run = async (client, intr, guildSettings) => {
+    if (!guildSettings.jailRole) return intr.reply({ content: "Use `/roleconfig jail` before using this command.", ephemeral: true });
 
-    if (args[0] === "enable") {
+    if (intr.options.getBoolean("enabled")) {
         guildSettings.antiSpam = true;
-        client.guildSettings.set(msg.guild.id, guildSettings);
+        client.guildSettings.set(intr.guild.id, guildSettings);
 
-        msg.channel.send("Successfully enabled anti-spam.");
-    } else if (args[0] === "disable") {
-        guildSettings.antiSpam = false;
-        client.guildSettings.set(msg.guild.id, guildSettings);
-
-        msg.channel.send("Successfully disabled anti-spam.");
+        intr.reply("Successfully enabled anti-spam.");
     } else {
-        msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
+        guildSettings.antiSpam = false;
+        client.guildSettings.set(intr.guild.id, guildSettings);
+
+        intr.reply("Successfully disabled anti-spam.");
     }
 };

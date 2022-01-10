@@ -1,112 +1,153 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "roleconfig",
-    usage: "roleconfig <mods|verify|jail> <args>",
-    info: "Manage the moderator roles, the role used for the verify command, and the role used for the jail command"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("roleconfig")
+        .setDescription("Manage the various roles that RGrunt keeps track of.")
+        .addSubcommandGroup(cmdGroup =>
+            cmdGroup.setName("mods")
+                .setDescription("Manage the roles that RGrunt considers to have moderator privileges.")
+                .addSubcommand(cmd =>
+                    cmd.setName("add")
+                        .setDescription("Adds a role to the moderators list.")
+                        .addRoleOption(option =>
+                            option.setName("role")
+                                .setDescription("The role to add.")
+                                .setRequired(true)))
+                .addSubcommand(cmd =>
+                    cmd.setName("remove")
+                        .setDescription("Removes a role from the moderators list.")
+                        .addRoleOption(option =>
+                            option.setName("role")
+                                .setDescription("The role to remove.")
+                                .setRequired(true)))
+                .addSubcommand(cmd =>
+                    cmd.setName("show")
+                        .setDescription("List all moderator roles.")))
+        .addSubcommandGroup(cmdGroup =>
+            cmdGroup.setName("verify")
+                .setDescription("Manage the role used for the verify command.")
+                .addSubcommand(cmd =>
+                    cmd.setName("set")
+                        .setDescription("Sets the verified role.")
+                        .addRoleOption(option =>
+                            option.setName("role")
+                                .setDescription("The role to use as the verified role.")
+                                .setRequired(true)))
+                .addSubcommand(cmd =>
+                    cmd.setName("show")
+                        .setDescription("Shows the verified role."))
+                .addSubcommand(cmd =>
+                    cmd.setName("clear")
+                        .setDescription("Clears the verified role.")))
+        .addSubcommandGroup(cmdGroup =>
+            cmdGroup.setName("jail")
+                .setDescription("Manage the role used for the jail command.")
+                .addSubcommand(cmd =>
+                    cmd.setName("set")
+                        .setDescription("Sets the jailed role.")
+                        .addRoleOption(option =>
+                            option.setName("role")
+                                .setDescription("The role to use as the jailed role.")
+                                .setRequired(true)))
+                .addSubcommand(cmd =>
+                    cmd.setName("show")
+                        .setDescription("Shows the jailed role."))
+                .addSubcommand(cmd =>
+                    cmd.setName("clear")
+                        .setDescription("Clears the jailed role.")))
+];
 
 exports.requireAdmin = true;
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {CommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
-exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length === 0) return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
-
-    switch (args[0]) {
+exports.run = async (client, intr, guildSettings) => {
+    switch (intr.options.getSubcommandGroup()) {
         case "mods":
-            switch (args[1]) {
+            switch (intr.options.getSubcommand()) {
                 case "add": {
-                    if (args.length !== 3) return msg.channel.send(`Usage: ${guildSettings.prefix}roleconfig mods add <@mention or id>`, { code: "" });
+                    const role = intr.options.getRole("role");
+                    if (guildSettings.modRoles.includes(role.id)) return intr.reply({ content: "Role is already in the moderators list.", ephemeral: true });
 
-                    const role = args[2].match(/[0-9]+/) ? args[2].match(/[0-9]+/)[0] : null;
+                    guildSettings.modRoles.push(role.id);
+                    client.guildSettings.set(intr.guild.id, guildSettings);
 
-                    if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
-                    if (guildSettings.modRoles.includes(role)) return msg.channel.send("Role is already in the moderators list.");
-
-                    guildSettings.modRoles.push(role);
-                    client.guildSettings.set(msg.guild.id, guildSettings);
-
-                    msg.channel.send(`Successfully added \`${msg.guild.roles.cache.get(role).name}\` to the moderator roles list.`);
+                    intr.reply(`Successfully added \`${role.name}\` to the moderator roles list.`);
                     break;
                 }
                 case "remove": {
-                    if (args.length !== 3) return msg.channel.send(`Usage: ${guildSettings.prefix}roleconfig mods remove <@mention or id>`, { code: "" });
+                    const role = intr.options.getRole("role");
+                    if (!guildSettings.modRoles.includes(role.id)) return intr.reply({ content: "Role is not part of the moderators list.", ephemeral: true });
 
-                    const role = args[2].match(/[0-9]+/) ? args[2].match(/[0-9]+/)[0] : null;
+                    guildSettings.modRoles = guildSettings.modRoles.filter(val => val !== role.id);
+                    client.guildSettings.set(intr.guild.id, guildSettings);
 
-                    if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
-                    if (!guildSettings.modRoles.includes(role)) return msg.channel.send("Role is not part of the moderators list.");
-
-                    guildSettings.modRoles = guildSettings.modRoles.filter(val => val !== role);
-                    client.guildSettings.set(msg.guild.id, guildSettings);
-
-                    msg.channel.send(`Successfully removed \`${msg.guild.roles.cache.get(role).name}\` from the moderator roles list.`);
-
+                    intr.reply(`Successfully removed \`${role.name}\` from the moderator roles list.`);
                     break;
                 }
-                case "list": {
+                case "show": {
                     let final = "```";
 
                     guildSettings.modRoles.forEach(role => {
-                        if (!msg.guild.roles.cache.has(role)) {
+                        if (!intr.guild.roles.cache.has(role)) {
                             guildSettings.modRoles = guildSettings.modRoles.filter(val => val !== role);
-                            client.guildSettings.set(msg.guild.id, guildSettings);
+                            client.guildSettings.set(intr.guild.id, guildSettings);
                             return;
                         }
 
-                        final += `${msg.guild.roles.cache.get(role).name}\n`;
+                        final += `${intr.guild.roles.cache.get(role).name}\n`;
                     });
 
                     if (guildSettings.modRoles.length === 0) final += "None\n";
 
                     final += "```";
-                    msg.channel.send(final);
+                    intr.reply({ content: final, ephemeral: true });
                     break;
                 }
-                default:
-                    return msg.channel.send(`Usage: ${guildSettings.prefix}roleconfig mods <add|remove|list>`, { code: "" });
             }
             break;
         case "verify":
-            if (args.length !== 2) return msg.channel.send(`Usage: ${guildSettings.prefix}roleconfig verify <@mention or id|clear>`, { code: "" });
-
-            if (args[1] === "clear") {
-                guildSettings.verifyRole = null;
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Successfully cleared the verified role.");
-            } else {
-                const role = args[1].match(/[0-9]+/) ? args[1].match(/[0-9]+/)[0] : null;
-
-                if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
-
-                guildSettings.verifyRole = role;
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Successfully set \`${msg.guild.roles.cache.get(role).name}\` as the verified role.`);
+            switch (intr.options.getSubcommand()) {
+                case "clear":
+                    guildSettings.verifyRole = null;
+                    client.guildSettings.set(intr.guild.id, guildSettings);
+                    intr.reply("Successfully cleared the verified role.");
+                    break;
+                case "set": {
+                    const role = intr.options.getRole("role");
+                    guildSettings.verifyRole = role.id;
+                    client.guildSettings.set(intr.guild.id, guildSettings);
+                    intr.reply(`Successfully set \`${role.name}\` as the verified role.`);
+                    break;
+                }
+                case "show":
+                    intr.reply({ content: guildSettings.verifyRole ? `<@&${guildSettings.verifyRole}>` : "None", ephemeral: true });
+                    break;
             }
             break;
         case "jail":
-            if (args.length !== 2) return msg.channel.send(`Usage: ${guildSettings.prefix}roleconfig jail <@mention or id|clear>`, { code: "" });
-
-            if (args[1] === "clear") {
-                guildSettings.jailRole = null;
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send("Successfully cleared the jailed role.");
-            } else {
-                const role = args[1].match(/[0-9]+/) ? args[1].match(/[0-9]+/)[0] : null;
-
-                if (!msg.guild.roles.cache.has(role)) return msg.channel.send("Role not found.");
-
-                guildSettings.jailRole = role;
-                client.guildSettings.set(msg.guild.id, guildSettings);
-                msg.channel.send(`Successfully set \`${msg.guild.roles.cache.get(role).name}\` as the jailed role.`);
+            switch (intr.options.getSubcommand()) {
+                case "clear":
+                    guildSettings.jailRole = null;
+                    client.guildSettings.set(intr.guild.id, guildSettings);
+                    intr.reply({ content: "Successfully cleared the jailed role.", ephemeral: true });
+                    break;
+                case "set": {
+                    const role = intr.options.getRole("role");
+                    guildSettings.jailRole = role.id;
+                    client.guildSettings.set(intr.guild.id, guildSettings);
+                    intr.reply(`Successfully set \`${role.name}\` as the jailed role.`);
+                    break;
+                }
+                case "show":
+                    intr.reply({ content: guildSettings.jailRole ? `<@&${guildSettings.jailRole}>` : "None", ephemeral: true });
+                    break;
             }
             break;
-        default:
-            return msg.channel.send(`Usage: \`${guildSettings.prefix}${exports.help.usage}\``);
     }
 };

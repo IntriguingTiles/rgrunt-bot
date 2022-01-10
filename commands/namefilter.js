@@ -1,36 +1,58 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
-exports.help = {
-    name: "namefilter",
-    usage: "namefilter <add|remove|list> [args]",
-    info: "Sets the (nick)name filter"
-};
+exports.commands = [
+    new SlashCommandBuilder()
+        .setName("namefilter")
+        .setDescription("Configures the (nick)name filter.")
+        .addSubcommand(cmd =>
+            cmd.setName("add")
+                .setDescription("Adds a word to the name filter.")
+                .addStringOption(option =>
+                    option.setName("word")
+                        .setDescription("The word to match.")
+                        .setRequired(true))
+                .addStringOption(option =>
+                    option.setName("replacement")
+                        .setDescription("What to replace the nickname with.")
+                        .setRequired(true)))
+        .addSubcommand(cmd =>
+            cmd.setName("remove")
+                .setDescription("Removes a word from the name filter.")
+                .addStringOption(option =>
+                    option.setName("word")
+                        .setDescription("The word to remove from the filter.")
+                        .setRequired(true)))
+        .addSubcommand(cmd =>
+            cmd.setName("show")
+                .setDescription("View the list of words in the filter."))
+];
 
 exports.requireAdmin = true;
 
 /**
  * @param {Client} client
- * @param {Message} msg
- * @param {string[]} args
+ * @param {CommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
-exports.run = async (client, msg, args, guildSettings) => {
-    if (args.length === 0) return msg.channel.send(`\`${guildSettings.prefix}${exports.help.usage}\``);
-    if (!msg.guild.me.permissions.has("MANAGE_NICKNAMES")) return msg.channel.send("I need the \"Manage Nicknames\" permission in order to filter (nick)names!");
+exports.run = async (client, intr, guildSettings) => {
+    if (!intr.guild.me.permissions.has("MANAGE_NICKNAMES")) return intr.reply({ content: "I need the \"Manage Nicknames\" permission in order to filter (nick)names!", ephemeral: true });
 
-    switch (args[0]) {
+    const word = intr.options.getString("word", false);
+    const replacement = intr.options.getString("replacement", false);
+
+    switch (intr.options.getSubcommand()) {
         case "add": {
-            if (args.length < 2) return msg.channel.send(`${guildSettings.prefix}namefilter add <word> [replacement]`, { code: "" });
-            if (guildSettings.badNames.includes(args[1].toLowerCase())) return msg.channel.send("That name is already in the name filter.");
+            if (guildSettings.badNames.includes(word.toLowerCase())) return intr.reply({ content: "That name is already in the name filter.", ephemeral: true });
 
-            args.length > 2 ? guildSettings.badNames.push([args[1].toLowerCase(), args.slice(2).join(" ")]) : guildSettings.badNames.push([args[1].toLowerCase()]);
-            client.guildSettings.set(msg.guild.id, guildSettings);
-            client.regenNameRegex(msg.guild.id);
-            msg.channel.send(`Successfully added \`${args[1]}\` to the name filter.`);
+            replacement ? guildSettings.badNames.push([word.toLowerCase(), replacement]) : guildSettings.badNames.push([word.toLowerCase()]);
+            client.guildSettings.set(intr.guild.id, guildSettings);
+            client.regenNameRegex(intr.guild.id);
+            intr.reply(`Successfully added \`${word}\` to the name filter.`);
 
-            const badNames = client.badNames.get(msg.guild.id);
+            const badNames = client.badNames.get(intr.guild.id);
 
-            msg.guild.members.cache.forEach(async member => {
+            intr.guild.members.cache.forEach(async member => {
                 if (!member.manageable) return;
                 badNames.forEach(name => {
                     if (member.displayName.match(name[0])) {
@@ -47,23 +69,21 @@ exports.run = async (client, msg, args, guildSettings) => {
             break;
         }
         case "remove": {
-            if (args.length !== 2) return msg.channel.send(`${guildSettings.prefix}namefilter remove <word>`, { code: "" });
+            if (guildSettings.badNames.filter(name => name[0] === word.toLowerCase()).length === 0) return intr.reply({ content: "Name not found in filter.", ephemeral: true });
 
-            if (guildSettings.badNames.filter(name => name[0] === args[1].toLowerCase()).length === 0) return msg.channel.send("Name not found in filter.");
+            guildSettings.badNames = guildSettings.badNames.filter(name => name[0] !== word.toLowerCase());
+            client.guildSettings.set(intr.guild.id, guildSettings);
+            client.regenNameRegex(intr.guild.id);
 
-            guildSettings.badNames = guildSettings.badNames.filter(name => name[0] !== args[1].toLowerCase());
-            client.guildSettings.set(msg.guild.id, guildSettings);
-            client.regenNameRegex(msg.guild.id);
-
-            msg.channel.send(`Successfully removed \`${args[1]}\` from the name filter.`);
+            intr.reply(`Successfully removed \`${word}\` from the name filter.`);
             break;
         }
-        case "list": {
+        case "show": {
             let final = "";
 
             guildSettings.badNames.forEach(word => final += `${word[0]}${word.length > 1 ? ` → ${word[1]}` : ""}\n`);
 
-            msg.channel.send(`Name filter:\n\`\`\`${final.length === 0 ? "None" : final}\`\`\``);
+            intr.reply({ content: `Name filter:\n\`\`\`${final.length === 0 ? "None" : final}\`\`\``, ephemeral: true });
             break;
         }
     }
