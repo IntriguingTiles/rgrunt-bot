@@ -30,7 +30,7 @@ async function messageCreate(msg) {
     if (msg.system) return;
     if (msg.content.length === 0) return;
     if (msg.channel.topic && msg.channel.topic.includes("[NO-XP]")) return;
-    // if (cooldowns.has(msg.author.id)) return;
+    if (cooldowns.has(msg.author.id)) return;
     
     /** @type {import("../types").Settings} */
     const guildSettings = client.guildSettings.get(msg.guild.id);
