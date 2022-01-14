@@ -61,6 +61,7 @@ async function guildMemberAdd(member) {
 async function guildMemberUpdate(oldMember, newMember) {
     /** @type {import("../types").Settings} */
     const guildSettings = client.guildSettings.get(newMember.guild.id);
+    const timestamp = Date.now();
 
     if (guildSettings.logFlags & flags.logs.USER && guildSettings.logChannel && newMember.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
@@ -88,13 +89,16 @@ async function guildMemberUpdate(oldMember, newMember) {
 
                 embed.addField("Roles Added", rolesAdded, true);
             } else {
+                await sleep(1000);
                 let rolesRemoved = "";
                 shouldPost = true;
 
                 oldMember.roles.cache.difference(newMember.roles.cache).forEach(role => {
-                    if (role.deleted) shouldPost = false;
+                    if (!newMember.guild.roles.cache.has(role.id)) shouldPost = false;
                     rolesRemoved += role.name;
                 });
+
+                if (rolesRemoved.length === 0) return;
 
                 embed.addField("Roles Removed", rolesRemoved, true);
             }
@@ -108,7 +112,6 @@ async function guildMemberUpdate(oldMember, newMember) {
         const msg = await newMember.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
         if (newMember.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-            const timestamp = Date.now();
             await sleep(800);
             const logs = await newMember.guild.fetchAuditLogs({ limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newMember.id && logs.entries.first().executor.id !== newMember.id) {
