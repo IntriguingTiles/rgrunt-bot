@@ -36,7 +36,7 @@ async function channelCreate(ch) {
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Channel Created", ch.guild.iconURL({ dynamic: true }));
+        embed.setAuthor({ name: "Channel Created", iconURL: ch.guild.iconURL({ dynamic: true }) });
         embed.setColor(colors.GREEN);
         embed.addField("Name", ch.name, true);
         embed.setFooter(`ID: ${ch.id}`);
@@ -76,7 +76,7 @@ async function channelUpdate(oldCh, newCh) {
         const embed = new MessageEmbed();
         let shouldPost = false;
 
-        embed.setAuthor("Channel Updated", newCh.guild.iconURL({ dynamic: true }));
+        embed.setAuthor({ name: "Channel Updated", iconURL: newCh.guild.iconURL({ dynamic: true }) });
         embed.setColor(colors.BLUE);
 
         if (oldCh.name !== newCh.name) {
@@ -127,7 +127,7 @@ async function channelDelete(ch) {
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Channel Deleted", ch.guild.iconURL({ dynamic: true }));
+        embed.setAuthor({ name: "Channel Deleted", iconURL: ch.guild.iconURL({ dynamic: true }) });
         embed.setColor(colors.ORANGE);
         embed.addField("Name", ch.name, true);
         embed.setFooter(`ID: ${ch.id}`);

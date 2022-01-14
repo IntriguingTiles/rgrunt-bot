@@ -38,13 +38,13 @@ async function messageDelete(msg) {
 
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Message Deleted", msg.guild.iconURL({ dynamic: true }));
+        embed.setAuthor({ name: "Message Deleted", iconURL: msg.guild.iconURL({ dynamic: true }) });
         embed.setColor(colors.ORANGE);
 
         if (!msg.partial) {
             if (msg.author.bot) return;
 
-            embed.setAuthor("Message Deleted", msg.author.displayAvatarURL({ dynamic: true }));
+            embed.setAuthor({ name: "Message Deleted", iconURL: msg.author.displayAvatarURL({ dynamic: true }) });
             embed.addField("Author", `${msg.author} ${msg.author.tag}`, true);
             embed.addField("Channel", `${msg.channel}`, true);
 
@@ -103,7 +103,7 @@ async function messageUpdate(oldMsg, newMsg) {
         if (newMsg.author.bot) return;
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Message Edited", newMsg.author.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Message Edited", iconURL: newMsg.author.displayAvatarURL({ dynamic: true }) });
         embed.setDescription(`[Jump to Message](${newMsg.url})`);
         embed.setColor(colors.BLUE);
 

@@ -42,7 +42,7 @@ async function guildMemberAdd(member) {
     if (guildSettings.logFlags & flags.logs.JOIN && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Member Joined", member.user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Joined", iconURL: member.user.displayAvatarURL({ dynamic: true }) });
         embed.addField("Account Created", `${moment(member.user.createdTimestamp).fromNow()}`);
         embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.GREEN);
@@ -68,7 +68,7 @@ async function guildMemberUpdate(oldMember, newMember) {
         // i'm not sure if we get member update events for boosts so we're doing this
         let shouldPost = false;
 
-        embed.setAuthor("Member Updated", newMember.user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Updated", iconURL: newMember.user.displayAvatarURL({ dynamic: true }) });
         embed.setColor(colors.BLUE);
         embed.addField("Member", `${newMember.user} ${newMember.user.tag}`);
 
@@ -132,7 +132,7 @@ async function guildMemberRemove(member) {
     if (guildSettings.logFlags & flags.logs.LEAVE && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)) {
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Member Left", member.user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Left", iconURL: member.user.displayAvatarURL({ dynamic: true }) });
 
         if (member.joinedTimestamp) embed.addField("Member For", moment(member.joinedTimestamp).fromNow(true));
 
@@ -160,7 +160,7 @@ async function guildMemberKick(member) {
         const embed = new MessageEmbed();
         const logs = await member.guild.fetchAuditLogs({ type: "MEMBER_KICK", limit: 1 });
 
-        embed.setAuthor("Member Kicked", member.user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Kicked", iconURL: member.user.displayAvatarURL({ dynamic: true }) });
         embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.ORANGE);
         embed.addField("Member", `${member.user} ${member.user.tag}`, true);
@@ -193,7 +193,7 @@ async function guildBanAdd(ban) {
 
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Member Banned", user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Banned", iconURL: user.displayAvatarURL({ dynamic: true }) });
         embed.setThumbnail(user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.ORANGE);
         embed.addField("Member", `${user} ${user.tag}`, true);
@@ -231,7 +231,7 @@ async function guildBanRemove(ban) {
 
         const embed = new MessageEmbed();
 
-        embed.setAuthor("Member Unbanned", user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Unbanned", iconURL: user.displayAvatarURL({ dynamic: true }) });
         embed.setThumbnail(user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.GREEN);
         embed.addField("Member", `${user} ${user.tag}`, true);
