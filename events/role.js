@@ -39,7 +39,7 @@ async function roleCreate(role) {
         embed.setColor(colors.GREEN);
         embed.addField("Name", role.name, true);
         embed.addField("Permissions", `\`${role.permissions.bitfield}\``, true);
-        embed.setFooter(`ID: ${role.id}`);
+        embed.setFooter({ text: `ID: ${role.id}` });
         embed.setTimestamp();
 
         const msg = await role.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -107,7 +107,7 @@ async function roleUpdate(oldRole, newRole) {
 
         if (!shouldPost) return;
 
-        embed.setFooter(`ID: ${newRole.id}`);
+        embed.setFooter({ text: `ID: ${newRole.id}` });
         embed.setTimestamp();
 
         const msg = await newRole.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -142,7 +142,7 @@ async function roleDelete(role) {
         embed.setAuthor({ name: "Role Deleted", iconURL: role.guild.iconURL({ dynamic: true }) });
         embed.setColor(colors.ORANGE);
         embed.addField("Name", role.name, true);
-        embed.setFooter(`ID: ${role.id}`);
+        embed.setFooter({ text: `ID: ${role.id}` });
         embed.setTimestamp();
 
         const msg = await role.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });

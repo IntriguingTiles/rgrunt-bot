@@ -63,7 +63,7 @@ async function messageDelete(msg) {
             embed.addField("Channel", `${msg.channel}`, true);
         }
 
-        embed.setFooter(`ID: ${msg.id}`);
+        embed.setFooter({ text: `ID: ${msg.id}` });
         embed.setTimestamp();
 
         if (msg.badWords) {
@@ -115,7 +115,7 @@ async function messageUpdate(oldMsg, newMsg) {
             embed.addField("After", newMsg.content ? truncate(newMsg.content, 300, 4) : "None");
         }
 
-        embed.setFooter(`ID: ${newMsg.id}`);
+        embed.setFooter({ text: `ID: ${newMsg.id}` });
         embed.setTimestamp();
 
         newMsg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });

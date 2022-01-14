@@ -49,7 +49,7 @@ async function guildUpdate(oldGuild, newGuild) {
 
         if (!shouldPost) return;
 
-        embed.setFooter(`ID: ${newGuild.id}`);
+        embed.setFooter({ text: `ID: ${newGuild.id}` });
         embed.setTimestamp();
 
         const msg = await newGuild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });

@@ -39,7 +39,7 @@ async function channelCreate(ch) {
         embed.setAuthor({ name: "Channel Created", iconURL: ch.guild.iconURL({ dynamic: true }) });
         embed.setColor(colors.GREEN);
         embed.addField("Name", ch.name, true);
-        embed.setFooter(`ID: ${ch.id}`);
+        embed.setFooter({ text: `ID: ${ch.id}` });
         embed.setTimestamp();
 
         const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -93,7 +93,7 @@ async function channelUpdate(oldCh, newCh) {
 
         if (!shouldPost) return;
 
-        embed.setFooter(`ID: ${newCh.id}`);
+        embed.setFooter({ text: `ID: ${newCh.id}` });
         embed.setTimestamp();
 
         const msg = await newCh.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -130,7 +130,7 @@ async function channelDelete(ch) {
         embed.setAuthor({ name: "Channel Deleted", iconURL: ch.guild.iconURL({ dynamic: true }) });
         embed.setColor(colors.ORANGE);
         embed.addField("Name", ch.name, true);
-        embed.setFooter(`ID: ${ch.id}`);
+        embed.setFooter({ text: `ID: ${ch.id}` });
         embed.setTimestamp();
 
         const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });

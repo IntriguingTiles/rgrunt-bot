@@ -47,7 +47,7 @@ async function guildMemberAdd(member) {
         embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.GREEN);
         embed.setDescription(`${member.user} ${member.user.tag}`);
-        embed.setFooter(`ID: ${member.id}`);
+        embed.setFooter({ text: `ID: ${member.id}` });
         embed.setTimestamp();
 
         member.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -102,7 +102,7 @@ async function guildMemberUpdate(oldMember, newMember) {
 
         if (!shouldPost) return;
 
-        embed.setFooter(`ID: ${newMember.id}`);
+        embed.setFooter({ text: `ID: ${newMember.id}` });
         embed.setTimestamp();
 
         const msg = await newMember.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -139,7 +139,7 @@ async function guildMemberRemove(member) {
         embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.ORANGE);
         embed.setDescription(`${member.user} ${member.user.tag}`);
-        embed.setFooter(`ID: ${member.id}`);
+        embed.setFooter({ text: `ID: ${member.id}` });
         embed.setTimestamp();
 
         member.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -173,7 +173,7 @@ async function guildMemberKick(member) {
             return;
         }
 
-        embed.setFooter(`ID: ${member.user.id}`);
+        embed.setFooter({ text: `ID: ${member.user.id}` });
         embed.setTimestamp();
 
         member.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -197,7 +197,7 @@ async function guildBanAdd(ban) {
         embed.setThumbnail(user.displayAvatarURL({ dynamic: true }));
         embed.setColor(colors.ORANGE);
         embed.addField("Member", `${user} ${user.tag}`, true);
-        embed.setFooter(`ID: ${user.id}`);
+        embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
 
         const msg = await guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
@@ -236,7 +236,7 @@ async function guildBanRemove(ban) {
         embed.setColor(colors.GREEN);
         embed.addField("Member", `${user} ${user.tag}`, true);
 
-        embed.setFooter(`ID: ${user.id}`);
+        embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
 
         const msg = await guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });

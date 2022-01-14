@@ -39,7 +39,7 @@ async function emojiCreate(emoji) {
         embed.setColor(colors.GREEN);
         embed.addField("Name", emoji.name, true);
         embed.setThumbnail(emoji.url);
-        embed.setFooter(`ID: ${emoji.id}`);
+        embed.setFooter({ text: `ID: ${emoji.id}` });
         embed.setTimestamp();
 
         if (!emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) embed.addField("Created by", `${await emoji.fetchAuthor()} ${await emoji.fetchAuthor().tag}`);
@@ -79,7 +79,7 @@ async function emojiUpdate(oldEmoji, newEmoji) {
         embed.setColor(colors.BLUE);
         embed.addField("Name", `\`${oldEmoji.name}\` → \`${newEmoji.name}\``, true);
         embed.setThumbnail(newEmoji.url);
-        embed.setFooter(`ID: ${newEmoji.id}`);
+        embed.setFooter({ text: `ID: ${newEmoji.id}` });
         embed.setTimestamp();
 
         if (newEmoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
@@ -114,7 +114,7 @@ async function emojiDelete(emoji) {
         embed.setColor(colors.ORANGE);
         embed.addField("Name", emoji.name, true);
         embed.setThumbnail(emoji.url);
-        embed.setFooter(`ID: ${emoji.id}`);
+        embed.setFooter({ text: `ID: ${emoji.id}` });
         embed.setTimestamp();
 
         if (emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
