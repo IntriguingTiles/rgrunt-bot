@@ -34,12 +34,12 @@ exports.run = async (client, intr, guildSettings) => {
         const member = intr.options.getMember("user");
         if (member.roles.cache.has(guildSettings.jailRole)) {
             await member.roles.remove(guildSettings.jailRole, `Unjailed by ${intr.user.tag}`);
-            intr.reply("Unjailed.");
+            intr.reply(`Unjailed ${member}.`);
             const index = guildSettings.jailedUsers.indexOf(member.id);
             if (index > -1) guildSettings.jailedUsers.splice(index, 1);
         } else {
             await member.roles.add(guildSettings.jailRole, `Jailed by ${intr.user.tag}`);
-            intr.reply("Jailed.");
+            intr.reply(`Jailed ${member}.`);
             guildSettings.jailedUsers.push(member.id);
         }
     } catch (err) {
