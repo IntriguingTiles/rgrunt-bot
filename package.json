@@ -19,12 +19,15 @@
   "dependencies": {
     "better-sqlite3": "^7.1.1",
     "bufferutil": "^4.0.2",
+    "canvas": "^2.8.0",
     "discord-api-types": "^0.26.0",
     "discord.js": "^13.3.1",
     "dotenv": "^8.2.0",
     "enmap": "^5.8.2",
     "erlpack": "github:discordapp/erlpack",
     "moment": "^2.29.1",
+    "node-fetch": "^2.6.6",
+    "numeral": "^2.0.6",
     "re2": "^1.17.1",
     "utf-8-validate": "^5.0.3",
     "zlib-sync": "^0.1.7"

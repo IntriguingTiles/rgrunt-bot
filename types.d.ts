@@ -1,3 +1,13 @@
+export type Level = {
+    id: string,
+    xp: number
+}
+
+export type LevelRole = {
+    id: string,
+    level: number
+}
+
 export type Settings = {
     prefix: string,
     logChannel: string,
@@ -8,5 +18,8 @@ export type Settings = {
     badWords: string[],
     badNames: string[][],
     antiSpam: boolean,
-    jailedUsers: string[]
+    jailedUsers: string[],
+    levelSystem: boolean,
+    levelRoles: LevelRole[],
+    levels: Level[]
 };

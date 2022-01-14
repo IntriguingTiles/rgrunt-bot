@@ -32,7 +32,10 @@ const defaultSettings = {
     badWords: [],
     badNames: [],
     antiSpam: false,
-    jailedUsers: []
+    jailedUsers: [],
+    levelSystem: false,
+    levelRoles: [],
+    levels: []
 };
 
 process.on("unhandledRejection", err => {
