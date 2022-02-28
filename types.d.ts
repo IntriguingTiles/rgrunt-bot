@@ -8,6 +8,13 @@ export type LevelRole = {
     level: number
 }
 
+export type Warn = {
+    user: string,
+    mod: string,
+    reason: string,
+    date: number
+}
+
 export type Settings = {
     prefix: string,
     logChannel: string,
@@ -21,5 +28,6 @@ export type Settings = {
     jailedUsers: string[],
     levelSystem: boolean,
     levelRoles: LevelRole[],
-    levels: Level[]
+    levels: Level[],
+    warns: Warn[]
 };

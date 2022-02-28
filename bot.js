@@ -35,7 +35,8 @@ const defaultSettings = {
     jailedUsers: [],
     levelSystem: false,
     levelRoles: [],
-    levels: []
+    levels: [],
+    warns: []
 };
 
 process.on("unhandledRejection", err => {
