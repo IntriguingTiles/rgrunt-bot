@@ -98,8 +98,6 @@ client.on("messageCreate", async msg => {
     if (cmd === "eval") {
         const args = msg.content.split(" ").slice(1);
         client.commands[cmd].run(client, msg, args, guildSettings);
-    } else {
-        msg.reply({ content: `Text-based commands are no longer supported. Try using \`/${cmd}\`.`, allowedMentions: { repliedUser: false } });
     }
 });
 
