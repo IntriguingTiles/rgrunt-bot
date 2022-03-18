@@ -47,7 +47,7 @@ exports.run = async (client, intr, guildSettings) => {
             replacement ? guildSettings.badNames.push([word.toLowerCase(), replacement]) : guildSettings.badNames.push([word.toLowerCase()]);
             client.guildSettings.set(intr.guild.id, guildSettings);
             client.regenNameRegex(intr.guild.id);
-            intr.reply(`Successfully added \`${word}\` to the name filter.`);
+            await intr.reply(`Successfully added \`${word}\` to the name filter.`);
 
             const badNames = client.badNames.get(intr.guild.id);
 
