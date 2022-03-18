@@ -116,3 +116,6 @@ dist
 
 # Enmap data
 data/
+
+# External fonts
+font/

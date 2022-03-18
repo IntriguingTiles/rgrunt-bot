@@ -1,8 +1,10 @@
 const { Client, CommandInteraction, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { createCanvas, loadImage } = require("canvas");
+const { createCanvas, loadImage, registerFont } = require("canvas");
 const xp = require("../utils/xp.js");
 const numeral = require("numeral");
+
+registerFont(__dirname + "/../font/calibri.ttf", { family: "Calibri" });
 
 exports.commands = [
     new SlashCommandBuilder()
