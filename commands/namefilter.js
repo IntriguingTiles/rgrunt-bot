@@ -14,8 +14,7 @@ exports.commands = [
                         .setRequired(true))
                 .addStringOption(option =>
                     option.setName("replacement")
-                        .setDescription("What to replace the nickname with.")
-                        .setRequired(true)))
+                        .setDescription("What to replace the nickname with.")))
         .addSubcommand(cmd =>
             cmd.setName("remove")
                 .setDescription("Removes a word from the name filter.")
