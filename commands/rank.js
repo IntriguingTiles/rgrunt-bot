@@ -133,6 +133,7 @@ async function generateCard(user, totalXP, levels, statusColor) {
     // draw username
     ctx.font = "40px Calibri";
     ctx.fillStyle = "#FFFFFF";
+    const infoY = 130;
     let usernameLength = ctx.measureText(username);
 
     while (usernameLength.width > 400) {
@@ -141,45 +142,46 @@ async function generateCard(user, totalXP, levels, statusColor) {
         if (usernameLength.width <= 400) username = username + "...";
     }
 
-    ctx.fillText(username, 251, 92 + usernameLength.emHeightAscent);
+    ctx.fillText(username, 251, infoY);
 
     // draw tag
     ctx.font = "28px Calibri";
     ctx.fillStyle = "#7F8384";
     if (usernameLength.width < 330) {
-        ctx.fillText(`#${discrim}`, 251 + usernameLength.width + 12, 92 + usernameLength.emHeightAscent);
+        ctx.fillText(`#${discrim}`, 251 + usernameLength.width + 12, infoY);
     }
 
     // draw total xp
     const totalXPLength = ctx.measureText(`/ ${shorten(nextXP)} XP`);
-    ctx.fillText(`/ ${shorten(nextXP)} XP`, 856 - totalXPLength.width, 92 + usernameLength.emHeightAscent);
+    ctx.fillText(`/ ${shorten(nextXP)} XP`, 856 - totalXPLength.width, infoY);
 
     // draw current xp
     ctx.fillStyle = "#FFFFFF";
     const curXPLength = ctx.measureText(shorten(curXP));
-    ctx.fillText(shorten(curXP), 856 - totalXPLength.width - curXPLength.width - 8, 92 + usernameLength.emHeightAscent);
+    ctx.fillText(shorten(curXP), 856 - totalXPLength.width - curXPLength.width - 8, infoY);
 
     // draw level number
     ctx.font = "70px Calibri";
     ctx.fillStyle = "#00AC21";
+    const levelY = 67;
     const levelNumLength = ctx.measureText(level);
-    ctx.fillText(level, 856 - levelNumLength.width, levelNumLength.emHeightAscent);
+    ctx.fillText(level, 856 - levelNumLength.width, levelY);
 
     // draw level text
     ctx.font = "28px Calibri";
     const levelTextLength = ctx.measureText("LEVEL");
-    ctx.fillText("LEVEL", 856 - levelNumLength.width - levelTextLength.width, levelNumLength.emHeightAscent);
+    ctx.fillText("LEVEL", 856 - levelNumLength.width - levelTextLength.width, levelY);
 
     // draw rank number
     ctx.font = "70px Calibri";
     ctx.fillStyle = "#FFFFFF";
     const rankNumLength = ctx.measureText(`#${rank}`);
-    ctx.fillText(`#${rank}`, 856 - levelNumLength.width - levelTextLength.width - rankNumLength.width - 15, levelNumLength.emHeightAscent);
+    ctx.fillText(`#${rank}`, 856 - levelNumLength.width - levelTextLength.width - rankNumLength.width - 15, levelY);
 
     // draw rank text
     ctx.font = "28px Calibri";
     const rankTextLength = ctx.measureText("RANK");
-    ctx.fillText("RANK", 856 - levelNumLength.width - levelTextLength.width - rankNumLength.width - 15 - rankTextLength.width - 10, levelNumLength.emHeightAscent);
+    ctx.fillText("RANK", 856 - levelNumLength.width - levelTextLength.width - rankNumLength.width - 15 - rankTextLength.width - 10, levelY);
 
     return canvas.toBuffer();
 }
