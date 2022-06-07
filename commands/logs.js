@@ -2,14 +2,14 @@ const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const flags = require("../utils/flags.js");
 
-const choices = [["All - All log types.", "all"]];
+const choices = [{ name: "All - All log types.", value: "all" }];
 
 // dynamically build the log choices
 for (let i = 0; i < flags.logs.TOTAL; i++) {
     const str = flags.logsStrings(1 << i);
     const name = str.split(" - ")[0];
     const desc = str.split(" - ")[1];
-    choices.push([`${name.slice(0, 1).toUpperCase()}${name.slice(1)} - ${desc.slice(0, 1).toUpperCase()}${desc.slice(1)}.`, name]);
+    choices.push({ name: `${name.slice(0, 1).toUpperCase()}${name.slice(1)} - ${desc.slice(0, 1).toUpperCase()}${desc.slice(1)}.`, value: name });
 }
 
 exports.commands = [
@@ -22,7 +22,7 @@ exports.commands = [
                 .addStringOption(option =>
                     option.setName("type")
                         .setDescription("The log type to enable.")
-                        .addChoices(choices)
+                        .addChoices(...choices)
                         .setRequired(true)))
         .addSubcommand(cmd =>
             cmd.setName("disable")
@@ -30,7 +30,7 @@ exports.commands = [
                 .addStringOption(option =>
                     option.setName("type")
                         .setDescription("The log type to disable.")
-                        .addChoices(choices)
+                        .addChoices(...choices)
                         .setRequired(true)))
         .addSubcommand(cmd =>
             cmd.setName("show")
