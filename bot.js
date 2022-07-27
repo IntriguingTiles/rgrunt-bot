@@ -102,8 +102,8 @@ client.on("messageCreate", async msg => {
 });
 
 client.on("interactionCreate", async intr => {
-    if (!intr.isCommand() && !intr.isContextMenu()) return;
-    const cmd = intr.commandName;
+    if (!intr.isCommand() && !intr.isContextMenu() && !intr.isButton()) return;
+    const cmd = intr.isButton() ? intr.message.interaction.commandName : intr.commandName;
     if (!(cmd in client.commands)) return;
     if (!intr.inGuild()) return;
 
@@ -126,7 +126,11 @@ client.on("interactionCreate", async intr => {
         }
     }
 
-    client.commands[cmd].run(client, intr, guildSettings);
+    if (intr.isButton()) {
+        client.commands[cmd].buttonPress(client, intr, guildSettings);
+    } else {
+        client.commands[cmd].run(client, intr, guildSettings);
+    }
 });
 
 process.on("SIGINT", async () => {
