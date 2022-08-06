@@ -91,8 +91,23 @@ async function roleUpdate(oldRole, newRole) {
         }
 
         if (oldRole.permissions.bitfield !== newRole.permissions.bitfield) {
-            embed.addFields([{ name: "Permissions", value: `\`${oldRole.permissions.bitfield}\` → \`${newRole.permissions.bitfield}\``, inline: true }]);
-            shouldPost = true;
+            if (newRole.permissions.missing(oldRole.permissions.bitfield).length > 0) {
+                // permissions were removed
+                embed.addFields([{
+                    name: "Permissions Removed", value: newRole.permissions.missing(oldRole.permissions.bitfield)
+                        .map(v => v.replace(/([A-Z]+)/g, " $1").trim()).join("\n"), inline: true
+                }]);
+                shouldPost = true;
+            }
+
+            if (oldRole.permissions.missing(newRole.permissions.bitfield).length > 0) {
+                // permissions were added
+                embed.addFields([{
+                    name: "Permissions Added", value: oldRole.permissions.missing(newRole.permissions.bitfield)
+                        .map(v => v.replace(/([A-Z]+)/g, " $1").trim()).join("\n"), inline: true
+                }]);
+                shouldPost = true;
+            }
         }
 
         if (oldRole.hoist !== newRole.hoist) {
