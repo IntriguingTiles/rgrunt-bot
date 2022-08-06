@@ -1,14 +1,14 @@
-const { Client, MessageEmbed, GuildEmoji } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, GuildEmoji, PermissionsBitField, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
-/** @type {Client} */
+/** @type {import("../types").ClientExt} */
 let client;
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.register = c => {
     client = c;
@@ -18,7 +18,7 @@ exports.register = c => {
 };
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.deregister = c => {
     c.removeListener("emojiCreate", emojiCreate);
@@ -33,30 +33,30 @@ async function emojiCreate(emoji) {
     const guildSettings = client.guildSettings.get(emoji.guild.id);
 
     if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Emoji Created", iconURL: emoji.guild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Emoji Created", iconURL: emoji.guild.iconURL() });
         embed.setColor(colors.GREEN);
-        embed.addField("Name", emoji.name, true);
+        embed.addFields([{ name: "Name", value: emoji.name, inline: true }]);
         embed.setThumbnail(emoji.url);
         embed.setFooter({ text: `ID: ${emoji.id}` });
         embed.setTimestamp();
 
-        if (!emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) embed.addField("Created by", `${await emoji.fetchAuthor()} ${await emoji.fetchAuthor().tag}`);
+        if (!emoji.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) embed.addFields([{ name: "Created by", value: `${await emoji.fetchAuthor()} ${await emoji.fetchAuthor().tag}` }]);
 
         const msg = await emoji.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (emoji.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await emoji.guild.fetchAuditLogs({ type: "EMOJI_CREATE", limit: 1 });
+            const logs = await emoji.guild.fetchAuditLogs({ type: AuditLogEvent.EmojiCreate, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === emoji.id) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
+                    embed.addFields([{ name: "Created by", value: `${log.executor} ${log.executor.tag}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -73,26 +73,26 @@ async function emojiUpdate(oldEmoji, newEmoji) {
     const guildSettings = client.guildSettings.get(newEmoji.guild.id);
 
     if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && newEmoji.guild.channels.cache.has(guildSettings.logChannel) && oldEmoji.name !== newEmoji.name) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Emoji Updated", iconURL: newEmoji.guild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Emoji Updated", iconURL: newEmoji.guild.iconURL() });
         embed.setColor(colors.BLUE);
-        embed.addField("Name", `\`${oldEmoji.name}\` → \`${newEmoji.name}\``, true);
+        embed.addFields([{ name: "Name", value: `\`${oldEmoji.name}\` → \`${newEmoji.name}\``, inline: true }]);
         embed.setThumbnail(newEmoji.url);
         embed.setFooter({ text: `ID: ${newEmoji.id}` });
         embed.setTimestamp();
 
-        if (newEmoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (newEmoji.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await newEmoji.guild.fetchAuditLogs({ type: "EMOJI_UPDATE", limit: 1 });
+            const logs = await newEmoji.guild.fetchAuditLogs({ type: AuditLogEvent.EmojiUpdate, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newEmoji.id) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                 }
             }
         }
@@ -108,26 +108,26 @@ async function emojiDelete(emoji) {
     const guildSettings = client.guildSettings.get(emoji.guild.id);
 
     if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Emoji Deleted", iconURL: emoji.guild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Emoji Deleted", iconURL: emoji.guild.iconURL() });
         embed.setColor(colors.ORANGE);
-        embed.addField("Name", emoji.name, true);
+        embed.addFields([{ name: "Name", value: emoji.name, inline: true }]);
         embed.setThumbnail(emoji.url);
         embed.setFooter({ text: `ID: ${emoji.id}` });
         embed.setTimestamp();
 
-        if (emoji.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (emoji.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await emoji.guild.fetchAuditLogs({ type: "EMOJI_DELETE", limit: 1 });
+            const logs = await emoji.guild.fetchAuditLogs({ type: AuditLogEvent.EmojiDelete, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === emoji.id) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
+                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${log.executor.tag}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                 }
             }
         }

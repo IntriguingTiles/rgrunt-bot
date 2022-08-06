@@ -1,6 +1,6 @@
-const { Client, CommandInteraction, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder, ContextMenuCommandBuilder } = require("@discordjs/builders");
-const { ApplicationCommandType } = require("discord-api-types/v9");
+const { ApplicationCommandType } = require("discord-api-types/v10");
 
 exports.commands = [
 	new SlashCommandBuilder()
@@ -16,16 +16,13 @@ exports.commands = [
 ];
 
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr) => {
 	intr.reply({
-		files: [intr.options.getUser("user").displayAvatarURL({
-			dynamic: true,
-			size: 4096
-		})],
+		files: [intr.options.getUser("user").displayAvatarURL({ size: 4096 })],
 		ephemeral: true
 	});
 };

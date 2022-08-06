@@ -1,4 +1,4 @@
-const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const moment = require("moment");
 
@@ -13,16 +13,16 @@ exports.commands = [
         .addStringOption(option =>
             option.setName("reason")
                 .setDescription("The reason for kicking."))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setDMPermission(false)
 ];
 
-exports.requireAdmin = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  */
 exports.run = async (client, intr) => {
-    if (!intr.guild.me.permissions.has("KICK_MEMBERS")) return intr.reply({ content: "I don't have permission to kick members.", ephemeral: true });
+    if (!intr.guild.members.me.permissions.has(PermissionsBitField.Flags.KickMembers)) return intr.reply({ content: "I don't have permission to kick members.", ephemeral: true });
 
     try {
         const member = intr.options.getMember("user");

@@ -1,4 +1,4 @@
-const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, ChannelType, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const flags = require("../utils/flags.js");
 
@@ -48,13 +48,13 @@ exports.commands = [
                 .addSubcommand(cmd =>
                     cmd.setName("clear")
                         .setDescription("Unsets the logging channel.")))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setDMPermission(false)
 ];
 
-exports.requireAdmin = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr, guildSettings) => {
@@ -134,9 +134,9 @@ exports.run = async (client, intr, guildSettings) => {
             const ch = intr.options.getChannel("channel");
 
             if (!ch) return intr.reply({ content: "Channel not found.", ephemeral: true });
-            if (ch.type !== "GUILD_TEXT") return intr.reply({ content: "Not a text channel.", ephemeral: true });
-            if (!ch.permissionsFor(client.user).has("SEND_MESSAGES")) return intr.reply({ content: `I don't have permission to send messages in ${ch}.`, ephemeral: true });
-            if (!ch.permissionsFor(client.user).has("EMBED_LINKS")) return intr.reply({ content: `I don't have permission to send embeds in ${ch}.`, ephemeral: true });
+            if (ch.type !== ChannelType.GuildText) return intr.reply({ content: "Not a text channel.", ephemeral: true });
+            if (!ch.permissionsFor(client.user).has(PermissionsBitField.Flags.SendMessages)) return intr.reply({ content: `I don't have permission to send messages in ${ch}.`, ephemeral: true });
+            if (!ch.permissionsFor(client.user).has(PermissionsBitField.Flags.EmbedLinks)) return intr.reply({ content: `I don't have permission to send embeds in ${ch}.`, ephemeral: true });
 
             guildSettings.logChannel = ch.id;
             client.guildSettings.set(intr.guild.id, guildSettings);

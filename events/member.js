@@ -1,15 +1,15 @@
-const { Client, GuildMember, MessageEmbed, Guild, User, GuildBan } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { GuildMember, EmbedBuilder, Guild, User, GuildBan, PermissionsBitField, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
 const moment = require("moment");
 const sleep = require("util").promisify(setTimeout);
 
-/** @type {Client} */
+/** @type {import("../types").ClientExt} */
 let client;
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.register = c => {
     client = c;
@@ -22,7 +22,7 @@ exports.register = c => {
 };
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.deregister = c => {
     c.removeListener("guildMemberAdd", guildMemberAdd);
@@ -40,11 +40,11 @@ async function guildMemberAdd(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
     if (guildSettings.logFlags & flags.logs.JOIN && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Member Joined", iconURL: member.user.displayAvatarURL({ dynamic: true }) });
-        embed.addField("Account Created", `${moment(member.user.createdTimestamp).fromNow()}`);
-        embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Joined", iconURL: member.user.displayAvatarURL() });
+        embed.addFields([{ name: "Account Created", value: `${moment(member.user.createdTimestamp).fromNow()}` }]);
+        embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.GREEN);
         embed.setDescription(`${member.user} ${member.user.tag}`);
         embed.setFooter({ text: `ID: ${member.id}` });
@@ -59,22 +59,21 @@ async function guildMemberAdd(member) {
  * @param {GuildMember} newMember 
  */
 async function guildMemberUpdate(oldMember, newMember) {
-    /** @type {import("../types").Settings} */
     const guildSettings = client.guildSettings.get(newMember.guild.id);
     const timestamp = Date.now();
 
     if (guildSettings.logFlags & flags.logs.USER && guildSettings.logChannel && newMember.guild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
         // i'm not sure if we get member update events for boosts so we're doing this
         let shouldPost = false;
 
-        embed.setAuthor({ name: "Member Updated", iconURL: newMember.user.displayAvatarURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Member Updated", iconURL: newMember.user.displayAvatarURL() });
         embed.setColor(colors.BLUE);
-        embed.addField("Member", `${newMember.user} ${newMember.user.tag}`);
+        embed.addFields([{ name: "Member", value: `${newMember.user} ${newMember.user.tag}` }]);
 
         if (oldMember.nickname !== newMember.nickname) {
-            embed.addField("Nickname", `${oldMember.nickname ? `\`${oldMember.nickname}\`` : "None"} → ${newMember.nickname ? `\`${newMember.nickname}\`` : "None"}`, true);
+            embed.addFields([{ name: "Nickname", value: `${oldMember.nickname ? `\`${oldMember.nickname}\`` : "None"} → ${newMember.nickname ? `\`${newMember.nickname}\`` : "None"}`, inline: true }]);
             shouldPost = true;
         }
 
@@ -87,7 +86,7 @@ async function guildMemberUpdate(oldMember, newMember) {
                     rolesAdded += role.name;
                 });
 
-                embed.addField("Roles Added", rolesAdded, true);
+                embed.addFields([{ name: "Roles Added", value: rolesAdded, inline: true }]);
             } else {
                 await sleep(1000);
                 let rolesRemoved = "";
@@ -100,7 +99,7 @@ async function guildMemberUpdate(oldMember, newMember) {
 
                 if (rolesRemoved.length === 0) return;
 
-                embed.addField("Roles Removed", rolesRemoved, true);
+                embed.addFields([{ name: "Roles Removed", value: rolesRemoved, inline: true }]);
             }
         }
 
@@ -111,14 +110,14 @@ async function guildMemberUpdate(oldMember, newMember) {
 
         const msg = await newMember.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (newMember.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (newMember.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             await sleep(800);
             const logs = await newMember.guild.fetchAuditLogs({ limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newMember.id && logs.entries.first().executor.id !== newMember.id) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -133,13 +132,13 @@ async function guildMemberRemove(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
     if (guildSettings.logFlags & flags.logs.LEAVE && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Member Left", iconURL: member.user.displayAvatarURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Member Left", iconURL: member.user.displayAvatarURL() });
 
-        if (member.joinedTimestamp) embed.addField("Member For", moment(member.joinedTimestamp).fromNow(true));
+        if (member.joinedTimestamp) embed.addFields([{ name: "Member For", value: moment(member.joinedTimestamp).fromNow(true) }]);
 
-        embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
+        embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.ORANGE);
         embed.setDescription(`${member.user} ${member.user.tag}`);
         embed.setFooter({ text: `ID: ${member.id}` });
@@ -155,23 +154,23 @@ async function guildMemberRemove(member) {
 async function guildMemberKick(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) && member.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) && member.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
         const timestamp = Date.now();
         await sleep(900);
         await member.user.fetch();
 
-        const embed = new MessageEmbed();
-        const logs = await member.guild.fetchAuditLogs({ type: "MEMBER_KICK", limit: 1 });
+        const embed = new EmbedBuilder();
+        const logs = await member.guild.fetchAuditLogs({ type: AuditLogEvent.MemberKick, limit: 1 });
 
-        embed.setAuthor({ name: "Member Kicked", iconURL: member.user.displayAvatarURL({ dynamic: true }) });
-        embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Kicked", iconURL: member.user.displayAvatarURL() });
+        embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.ORANGE);
-        embed.addField("Member", `${member.user} ${member.user.tag}`, true);
+        embed.addFields([{ name: "Member", value: `${member.user} ${member.user.tag}`, inline: true }]);
 
         if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Math.abs(timestamp - logs.entries.first().createdTimestamp) < 1400) {
             const log = logs.entries.first();
-            embed.addField("Kicked by", `${log.executor} ${log.executor.tag}`, true);
-            if (log.reason) embed.addField("Reason", log.reason);
+            embed.addFields([{ name: "Kicked by", value: `${log.executor} ${log.executor.tag}`, inline: true }]);
+            if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
         } else {
             return;
         }
@@ -194,26 +193,26 @@ async function guildBanAdd(ban) {
     if (guildSettings.logFlags & flags.logs.BAN && guildSettings.logChannel && guild.channels.cache.has(guildSettings.logChannel)) {
         await user.fetch();
 
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Member Banned", iconURL: user.displayAvatarURL({ dynamic: true }) });
-        embed.setThumbnail(user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Banned", iconURL: user.displayAvatarURL() });
+        embed.setThumbnail(user.displayAvatarURL());
         embed.setColor(colors.ORANGE);
-        embed.addField("Member", `${user} ${user.tag}`, true);
+        embed.addFields([{ name: "Member", value: `${user} ${user.tag}`, inline: true }]);
         embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
 
         const msg = await guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(900);
-            const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_ADD", limit: 1 });
+            const logs = await guild.fetchAuditLogs({ type: AuditLogEvent.MemberBanAdd, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Banned by", `${log.executor} ${log.executor.tag}`, true);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    embed.addFields([{ name: "Banned by", value: `${log.executor} ${log.executor.tag}`, inline: true }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -232,27 +231,27 @@ async function guildBanRemove(ban) {
     if (guildSettings.logFlags & flags.logs.BAN && guildSettings.logChannel && guild.channels.cache.has(guildSettings.logChannel)) {
         await user.fetch();
 
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Member Unbanned", iconURL: user.displayAvatarURL({ dynamic: true }) });
-        embed.setThumbnail(user.displayAvatarURL({ dynamic: true }));
+        embed.setAuthor({ name: "Member Unbanned", iconURL: user.displayAvatarURL() });
+        embed.setThumbnail(user.displayAvatarURL());
         embed.setColor(colors.GREEN);
-        embed.addField("Member", `${user} ${user.tag}`, true);
+        embed.addFields([{ name: "Member", value: `${user} ${user.tag}`, inline: true }]);
 
         embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
 
         const msg = await guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await guild.fetchAuditLogs({ type: "MEMBER_BAN_REMOVE", limit: 1 });
+            const logs = await guild.fetchAuditLogs({ type: AuditLogEvent.MemberBanRemove, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Unbanned by", `${log.executor} ${log.executor.tag}`, true);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    embed.addFields([{ name: "Unbanned by", value: `${log.executor} ${log.executor.tag}`, inline: true }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }

@@ -1,14 +1,14 @@
-const { Client, MessageEmbed, Guild } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, Guild, PermissionsBitField, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
-/** @type {Client} */
+/** @type {import("../types").ClientExt} */
 let client;
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.register = c => {
     client = c;
@@ -16,7 +16,7 @@ exports.register = c => {
 };
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.deregister = c => {
     c.removeListener("guildUpdate", guildUpdate);
@@ -31,19 +31,14 @@ async function guildUpdate(oldGuild, newGuild) {
     const guildSettings = client.guildSettings.get(newGuild.id);
 
     if (guildSettings.logFlags & flags.logs.SERVER && guildSettings.logChannel && newGuild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
         let shouldPost = false;
 
-        embed.setAuthor({ name: "Server Updated", iconURL: newGuild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Server Updated", iconURL: newGuild.iconURL() });
         embed.setColor(colors.BLUE);
 
         if (oldGuild.name !== newGuild.name) {
-            embed.addField("Name", `\`${oldGuild.name}\` → \`${newGuild.name}\``);
-            shouldPost = true;
-        }
-
-        if (oldGuild.region !== newGuild.region) {
-            embed.addField("Region", `\`${oldGuild.region}\` → \`${newGuild.region}\``);
+            embed.addFields([{ name: "Name", value: `\`${oldGuild.name}\` → \`${newGuild.name}\`` }]);
             shouldPost = true;
         }
 
@@ -54,15 +49,15 @@ async function guildUpdate(oldGuild, newGuild) {
 
         const msg = await newGuild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (newGuild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (newGuild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await newGuild.fetchAuditLogs({ type: "GUILD_UPDATE", limit: 1 });
+            const logs = await newGuild.fetchAuditLogs({ type: AuditLogEvent.GuildUpdate, limit: 1 });
             if (logs.entries.first()) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }

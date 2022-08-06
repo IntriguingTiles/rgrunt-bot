@@ -1,14 +1,14 @@
-const { Client, MessageEmbed, GuildChannel } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, GuildChannel, PermissionsBitField, AuditLogEvent, ChannelType } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
 const sleep = require("util").promisify(setTimeout);
 
-/** @type {Client} */
+/** @type {import("../types").ClientExt} */
 let client;
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.register = c => {
     client = c;
@@ -18,7 +18,7 @@ exports.register = c => {
 };
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.deregister = c => {
     c.removeListener("channelCreate", channelCreate);
@@ -30,31 +30,31 @@ exports.deregister = c => {
  * @param {GuildChannel} ch 
  */
 async function channelCreate(ch) {
-    if (ch.type === "DM") return;
+    if (ch.type === ChannelType.DM) return;
     const guildSettings = client.guildSettings.get(ch.guild.id);
 
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Channel Created", iconURL: ch.guild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Channel Created", iconURL: ch.guild.iconURL() });
         embed.setColor(colors.GREEN);
-        embed.addField("Name", ch.name, true);
+        embed.addFields([{ name: "Name", value: ch.name, inline: true }]);
         embed.setFooter({ text: `ID: ${ch.id}` });
         embed.setTimestamp();
 
         const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (ch.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (ch.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await ch.guild.fetchAuditLogs({ type: "CHANNEL_CREATE", limit: 1 });
+            const logs = await ch.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelCreate, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Created by", `${log.executor} ${log.executor.tag}`);
+                    embed.addFields([{ name: "Created by", value: `${log.executor} ${log.executor.tag}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -68,26 +68,26 @@ async function channelCreate(ch) {
  * @param {GuildChannel} newCh 
  */
 async function channelUpdate(oldCh, newCh) {
-    if (newCh.type === "DM") return;
+    if (newCh.type === ChannelType.DM) return;
     const guildSettings = client.guildSettings.get(newCh.guild.id);
 
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && newCh.guild.channels.cache.has(guildSettings.logChannel)) {
         if (newCh.topic && newCh.topic.includes("[NO-LOGS]")) return;
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
         let shouldPost = false;
 
-        embed.setAuthor({ name: "Channel Updated", iconURL: newCh.guild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Channel Updated", iconURL: newCh.guild.iconURL() });
         embed.setColor(colors.BLUE);
 
         if (oldCh.name !== newCh.name) {
-            embed.addField("Name", `\`${oldCh.name}\` → \`${newCh.name}\``, true);
+            embed.addFields([{ name: "Name", value: `\`${oldCh.name}\` → \`${newCh.name}\``, inline: true }]);
             shouldPost = true;
         } else {
-            embed.addField("Name", newCh.name, true);
+            embed.addFields([{ name: "Name", value: newCh.name, inline: true }]);
         }
 
         if (oldCh.topic !== newCh.topic) {
-            embed.addField("Topic", `${oldCh.topic ? `\`${oldCh.topic}\`` : "None"} → ${newCh.topic ? `\`${newCh.topic}\`` : "None"}`, true);
+            embed.addFields([{ name: "Topic", value: `${oldCh.topic ? `\`${oldCh.topic}\`` : "None"} → ${newCh.topic ? `\`${newCh.topic}\`` : "None"}`, inline: true }]);
             shouldPost = true;
         }
 
@@ -98,17 +98,17 @@ async function channelUpdate(oldCh, newCh) {
 
         const msg = await newCh.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (newCh.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (newCh.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await newCh.guild.fetchAuditLogs({ type: "CHANNEL_UPDATE", limit: 1 });
+            const logs = await newCh.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === newCh.id) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Updated by", `${log.executor} ${log.executor.tag}`);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -121,31 +121,31 @@ async function channelUpdate(oldCh, newCh) {
  * @param {GuildChannel} ch 
  */
 async function channelDelete(ch) {
-    if (ch.type === "DM") return;
+    if (ch.type === ChannelType.DM) return;
     const guildSettings = client.guildSettings.get(ch.guild.id);
 
     if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Channel Deleted", iconURL: ch.guild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Channel Deleted", iconURL: ch.guild.iconURL() });
         embed.setColor(colors.ORANGE);
-        embed.addField("Name", ch.name, true);
+        embed.addFields([{ name: "Name", value: ch.name, inline: true }]);
         embed.setFooter({ text: `ID: ${ch.id}` });
         embed.setTimestamp();
 
         const msg = await ch.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
-        if (ch.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        if (ch.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await ch.guild.fetchAuditLogs({ type: "CHANNEL_DELETE", limit: 1 });
+            const logs = await ch.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelDelete, limit: 1 });
             if (logs.entries.first() && logs.entries.first().target.id === ch.id) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
+                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${log.executor.tag}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     msg.edit({ embeds: [embed] });
                 }
             }

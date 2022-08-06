@@ -1,4 +1,4 @@
-const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 exports.commands = [
@@ -13,13 +13,13 @@ exports.commands = [
             option.setName("reason")
                 .setDescription("The warn reason.")
                 .setRequired(true))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
+        .setDMPermission(false)
 ];
 
-exports.requireMod = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr, guildSettings) => {

@@ -1,4 +1,4 @@
-const { Client, CommandInteraction, MessageAttachment } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, AttachmentBuilder, User } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const xp = require("../utils/xp.js");
@@ -13,11 +13,12 @@ exports.commands = [
         .addUserOption(option =>
             option.setName("user")
                 .setDescription("The member to show the rank of."))
+        .setDMPermission(false)
 ];
 
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr, guildSettings) => {
@@ -48,7 +49,7 @@ exports.run = async (client, intr, guildSettings) => {
     }
 
     const xp = guildSettings.levels.find(l => l.id === user.id).xp;
-    intr.reply({ files: [new MessageAttachment(await generateCard(user, xp, guildSettings.levels, color))], ephemeral: true });
+    intr.reply({ files: [new AttachmentBuilder(await generateCard(user, xp, guildSettings.levels, color))], ephemeral: true });
 };
 
 /**
@@ -60,7 +61,7 @@ exports.run = async (client, intr, guildSettings) => {
  */
 async function generateCard(user, totalXP, levels, statusColor) {
     const canvas = createCanvas(886, 210);
-    const pfp = await loadImage(user.displayAvatarURL({ format: "png" }));
+    const pfp = await loadImage(user.displayAvatarURL({ extension: "png" }));
     let username = user.username;
     const discrim = user.discriminator;
     const level = xp.levelFromXP(totalXP);

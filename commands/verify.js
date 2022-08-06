@@ -1,6 +1,6 @@
-const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder, ContextMenuCommandBuilder } = require("@discordjs/builders");
-const { ApplicationCommandType } = require("discord-api-types/v9");
+const { ApplicationCommandType } = require("discord-api-types/v10");
 
 exports.commands = [
     new SlashCommandBuilder()
@@ -9,23 +9,25 @@ exports.commands = [
         .addUserOption(option =>
             option.setName("user")
                 .setDescription("The target user.")
-                .setRequired(true)),
+                .setRequired(true))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
+        .setDMPermission(false),
     new ContextMenuCommandBuilder()
         .setName("Verify")
         .setType(ApplicationCommandType.User)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
+        .setDMPermission(false)
 ];
 
-exports.requireMod = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr, guildSettings) => {
     if (!guildSettings.verifyRole) return intr.reply({ content: "Use `/roleconfig verify` before using this command.", ephemeral: true });
     if (!intr.guild.roles.cache.has(guildSettings.verifyRole)) return intr.reply({ content: "The role used for verify no longer exists.", ephemeral: true });
-    if (!intr.guild.me.permissions.has("MANAGE_ROLES")) return intr.reply({ content: "I don't have permission to manage roles.", ephemeral: true });
+    if (!intr.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) return intr.reply({ content: "I don't have permission to manage roles.", ephemeral: true });
 
     try {
         await intr.options.getMember("user").roles.add(guildSettings.verifyRole, `Verified by ${intr.user.tag}`);

@@ -5,16 +5,18 @@ const fs = require("fs");
 const RE2 = require("re2");
 const lookalikes = require("./utils/lookalikes.js");
 
+/** @type {import("./types").ClientExt} */
 const client = new Discord.Client({
     intents: [
-        Discord.Intents.FLAGS.GUILDS,
-        Discord.Intents.FLAGS.GUILD_MEMBERS,
-        Discord.Intents.FLAGS.GUILD_BANS,
-        Discord.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-        Discord.Intents.FLAGS.GUILD_MESSAGES,
-        Discord.Intents.FLAGS.GUILD_PRESENCES
+        Discord.GatewayIntentBits.Guilds,
+        Discord.GatewayIntentBits.GuildMembers,
+        Discord.GatewayIntentBits.GuildBans,
+        Discord.GatewayIntentBits.GuildEmojisAndStickers,
+        Discord.GatewayIntentBits.GuildMessages,
+        Discord.GatewayIntentBits.GuildPresences,
+        Discord.GatewayIntentBits.MessageContent
     ],
-    partials: ["MESSAGE"]
+    partials: [Discord.Partials.Message]
 });
 
 client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: true, ensureProps: true });
@@ -23,7 +25,6 @@ client.badNames = new Discord.Collection();
 client.login(process.env.TOKEN);
 
 const defaultSettings = {
-    prefix: "!",
     logChannel: null,
     verifyRole: null,
     jailRole: null,
@@ -41,7 +42,7 @@ const defaultSettings = {
 
 process.on("unhandledRejection", err => {
     console.error(`Unhandled promise rejection!\n${err.stack}`);
-    if (client.readyTimestamp) client.users.cache.get("221017760111656961").send(err.stack);
+    if (client.readyTimestamp && client.user.id === "715364254383079455") client.users.cache.get("221017760111656961").send(err.stack);
 });
 
 client.on("error", console.error);
@@ -70,30 +71,12 @@ client.on("guildDelete", async guild => {
 client.on("messageCreate", async msg => {
     if (msg.partial) return;
     if (msg.author.bot) return;
-    if (msg.channel.type === "DM") return;
-    if (!msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) return;
+    if (!msg.content.startsWith("!")) return;
 
     const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
-    if (!msg.content.startsWith(guildSettings.prefix)) return;
-    const cmd = msg.content.slice(guildSettings.prefix.length).split(" ")[0];
+    const cmd = msg.content.slice(1).split(" ")[0];
 
     if (!(cmd in client.commands)) return;
-
-    if (client.commands[cmd].requireAdmin) {
-        if (!msg.member.permissions.has("MANAGE_GUILD") && msg.author.id !== "221017760111656961") return;
-    }
-
-    if (client.commands[cmd].requireMod) {
-        if (!msg.member.permissions.has("MANAGE_GUILD") && msg.author.id !== "221017760111656961") {
-            let hasPerms = false;
-
-            guildSettings.modRoles.forEach(role => {
-                if (msg.member.roles.cache.has(role)) hasPerms = true;
-            });
-
-            if (!hasPerms) return;
-        }
-    }
 
     if (cmd === "eval") {
         const args = msg.content.split(" ").slice(1);
@@ -102,29 +85,12 @@ client.on("messageCreate", async msg => {
 });
 
 client.on("interactionCreate", async intr => {
-    if (!intr.isCommand() && !intr.isContextMenu() && !intr.isButton()) return;
+    if (!intr.isChatInputCommand() && !intr.isContextMenuCommand() && !intr.isButton()) return;
     const cmd = intr.isButton() ? intr.message.interaction.commandName : intr.commandName;
     if (!(cmd in client.commands)) return;
-    if (!intr.inGuild()) return;
+    if (!intr.inGuild()) return intr.reply({ content: "Sorry, RGrunt commands cannot be used in direct messages at this time.", ephemeral: true });
 
     const guildSettings = client.guildSettings.ensure(intr.guild.id, defaultSettings);
-
-    if (client.commands[cmd].requireAdmin) {
-        if (!intr.memberPermissions.has("MANAGE_GUILD") && intr.user.id !== "221017760111656961")
-            return intr.reply({ content: "You do not have permission to use this command.", ephemeral: true });
-    }
-
-    if (client.commands[cmd].requireMod) {
-        if (!intr.memberPermissions.has("MANAGE_GUILD") && intr.user.id !== "221017760111656961") {
-            let hasPerms = false;
-
-            guildSettings.modRoles.forEach(role => {
-                if (intr.member.roles.cache.has(role)) hasPerms = true;
-            });
-
-            if (!hasPerms) return intr.reply({ content: "You do not have permission to use this command.", ephemeral: true });
-        }
-    }
 
     if (intr.isButton()) {
         client.commands[cmd].buttonPress(client, intr, guildSettings);
@@ -152,6 +118,7 @@ client.loadCommands = () => {
     client.commands = {};
 
     for (let i = 0; i < commands.length; i++) {
+        /** @type {import("./types").Command} */
         let cmd = commands[i];
         if (cmd.match(/\.js$/)) {
             delete require.cache[require.resolve(`./commands/${cmd}`)];

@@ -1,4 +1,4 @@
-const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const fetch = require("node-fetch").default;
 
@@ -40,13 +40,13 @@ exports.commands = [
                             option.setName("role")
                                 .setDescription("The role to remove.")
                                 .setRequired(true))))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setDMPermission(false)
 ];
 
-exports.requireAdmin = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr, guildSettings) => {
@@ -100,12 +100,12 @@ exports.run = async (client, intr, guildSettings) => {
         case "rewards":
             switch (intr.options.getSubcommand()) {
                 case "add": {
-                    if (!intr.guild.me.permissions.has("MANAGE_ROLES")) return intr.reply({ content: "I don't have permission to manage roles.", ephemeral: true });
+                    if (!intr.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) return intr.reply({ content: "I don't have permission to manage roles.", ephemeral: true });
 
                     const level = intr.options.getInteger("level");
                     const role = intr.options.getRole("role");
                     if (guildSettings.levelRoles.filter(l => l.id === role.id).length === 0) {
-                        if (intr.guild.me.roles.highest.position >= role.position) {
+                        if (intr.guild.members.me.roles.highest.position >= role.position) {
 
                             guildSettings.levelRoles.push({ id: role.id, level: level });
                             intr.reply(`Successfully set ${role} as a reward for level ${level}.`);

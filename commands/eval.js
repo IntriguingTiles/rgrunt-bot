@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars*/
 const Discord = require("discord.js");
 const fs = require("fs");
-const { Client, Message } = require("discord.js");
+const { Message } = require("discord.js");
 
 /**
- * @param {Client} client
+ * @param {import("../types").ClientExt} client
  * @param {Message} msg
  * @param {string[]} args
  * @param {import("../types").Settings} guildSettings

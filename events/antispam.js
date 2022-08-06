@@ -1,10 +1,10 @@
-const { Client, Message, GuildMember } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Message, PermissionsBitField, ChannelType } = require("discord.js"); // eslint-disable-line no-unused-vars
 
-/** @type {Client} */
+/** @type {import("../types").ClientExt} */
 let client;
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.register = c => {
     client = c;
@@ -12,7 +12,7 @@ exports.register = c => {
 };
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.deregister = c => {
     c.removeListener("messageCreate", messageCreate);
@@ -23,11 +23,11 @@ exports.deregister = c => {
  */
 async function messageCreate(msg) {
     if (msg.partial) return;
-    if (msg.channel.type === "DM") return;
+    if (msg.channel.type === ChannelType.DM) return;
     if (msg.author.bot) return;
     if (!msg.member.manageable) return;
-    if (msg.member.permissions.has("MANAGE_GUILD")) return;
-    if (!msg.guild.me.permissions.has("MANAGE_ROLES")) return;
+    if (msg.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
+    if (!msg.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) return;
     if (msg.mentions.members.filter(member => !member.user.bot).size < 5) return;
     if (!client.guildSettings.get(msg.guild.id).antiSpam) return;
     if (!client.guildSettings.get(msg.guild.id).jailRole) return;
@@ -35,5 +35,5 @@ async function messageCreate(msg) {
 
     msg.member.roles.add(client.guildSettings.get(msg.guild.id).jailRole);
 
-    if (msg.channel.permissionsFor(client.user).has("SEND_MESSAGES")) msg.channel.send("Jailed.");
+    if (msg.channel.permissionsFor(client.user).has(PermissionsBitField.Flags.SendMessages)) msg.channel.send("Jailed.");
 }

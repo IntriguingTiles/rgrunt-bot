@@ -1,4 +1,4 @@
-const { Client, CommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 exports.commands = [
@@ -22,17 +22,17 @@ exports.commands = [
         .addSubcommand(cmd =>
             cmd.setName("show")
                 .setDescription("View the list of words in the filter."))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setDMPermission(false)
 ];
 
-exports.requireAdmin = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr, guildSettings) => {
-    if (!intr.guild.me.permissions.has("MANAGE_MESSAGES")) return intr.reply({ content: "I need the \"Manage Messages\" permission in order to filter messages!", ephemeral: true });
+    if (!intr.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageMessages)) return intr.reply({ content: "I need the \"Manage Messages\" permission in order to filter messages.", ephemeral: true });
 
     const word = intr.options.getString("word", false);
 

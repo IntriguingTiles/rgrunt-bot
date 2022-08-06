@@ -1,6 +1,6 @@
-const { Client, CommandInteraction, MessageEmbed } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, EmbedBuilder, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder, ContextMenuCommandBuilder } = require("@discordjs/builders");
-const { ApplicationCommandType } = require("discord-api-types/v9");
+const { ApplicationCommandType } = require("discord-api-types/v10");
 const colors = require("../utils/colors");
 
 exports.commands = [
@@ -10,17 +10,19 @@ exports.commands = [
         .addUserOption(option =>
             option.setName("user")
                 .setDescription("The user to show warns for.")
-                .setRequired(true)),
+                .setRequired(true))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
+        .setDMPermission(false),
     new ContextMenuCommandBuilder()
         .setName("View Infractions")
         .setType(ApplicationCommandType.User)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
+        .setDMPermission(false)
 ];
 
-exports.requireMod = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr, guildSettings) => {
@@ -29,9 +31,9 @@ exports.run = async (client, intr, guildSettings) => {
 
     if (warns.length === 0) return intr.reply({ content: `${user} has no warns.`, ephemeral: true });
 
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
 
-    embed.setAuthor({ name: "Warns For", iconURL: user.displayAvatarURL({ dynamic: true }) });
+    embed.setAuthor({ name: "Warns For", iconURL: user.displayAvatarURL() });
     embed.setColor(colors.RED);
     embed.setDescription(`${user} ${user.tag}`);
     embed.setFooter({ text: `ID: ${user.id}` });
@@ -43,7 +45,7 @@ exports.run = async (client, intr, guildSettings) => {
         warnText += `${warn.reason} - <t:${warn.date}:R> - <@${warn.mod}>\n`;
     });
 
-    embed.addField("Warns", warnText);
+    embed.addFields([{ name: "Warns", value: warnText }]);
 
     intr.reply({ embeds: [embed], ephemeral: true });
 };

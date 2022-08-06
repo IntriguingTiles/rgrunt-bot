@@ -1,15 +1,15 @@
-const { Client, MessageEmbed, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, Message, PermissionsBitField, ChannelType, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
 const truncate = require("../utils/truncate.js");
 const sleep = require("util").promisify(setTimeout);
 
-/** @type {Client} */
+/** @type {import("../types").ClientExt} */
 let client;
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.register = c => {
     client = c;
@@ -18,7 +18,7 @@ exports.register = c => {
 };
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.deregister = c => {
     c.removeListener("messageDelete", messageDelete);
@@ -29,26 +29,26 @@ exports.deregister = c => {
  * @param {Message} msg
  */
 async function messageDelete(msg) {
-    if (msg.channel.type === "DM") return;
+    if (msg.channel.type === ChannelType.DM) return;
 
     const guildSettings = client.guildSettings.get(msg.guild.id);
 
     if (guildSettings.logFlags & flags.logs.DELETE && guildSettings.logChannel && msg.guild.channels.cache.has(guildSettings.logChannel)) {
         if (msg.channel.topic && msg.channel.topic.includes("[NO-LOGS]")) return;
 
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Message Deleted", iconURL: msg.guild.iconURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Message Deleted", iconURL: msg.guild.iconURL() });
         embed.setColor(colors.ORANGE);
 
         if (!msg.partial) {
             if (msg.author.bot) return;
 
-            embed.setAuthor({ name: "Message Deleted", iconURL: msg.author.displayAvatarURL({ dynamic: true }) });
-            embed.addField("Author", `${msg.author} ${msg.author.tag}`, true);
-            embed.addField("Channel", `${msg.channel}`, true);
+            embed.setAuthor({ name: "Message Deleted", iconURL: msg.author.displayAvatarURL() });
+            embed.addFields([{ name: "Author", value: `${msg.author} ${msg.author.tag}`, inline: true }]);
+            embed.addFields([{ name: "Channel", value: `${msg.channel}`, inline: true }]);
 
-            if (msg.content.length !== 0) embed.addField("Contents", truncate(msg.content, 300, 8));
+            if (msg.content.length !== 0) embed.addFields([{ name: "Contents", value: truncate(msg.content, 300, 8) }]);
 
             if (msg.attachments.size !== 0) {
                 let attachments = "";
@@ -57,30 +57,30 @@ async function messageDelete(msg) {
                     attachments += `${attachment.proxyURL}\n`;
                 });
 
-                embed.addField("Attachments", attachments);
+                embed.addFields([{ name: "Attachments", value: attachments }]);
             }
         } else {
-            embed.addField("Channel", `${msg.channel}`, true);
+            embed.addFields([{ name: "Channel", value: `${msg.channel}`, inline: true }]);
         }
 
         embed.setFooter({ text: `ID: ${msg.id}` });
         embed.setTimestamp();
 
         if (msg.badWords) {
-            embed.addField("Deleted by", `${client.user} ${client.user.tag}`);
-            embed.addField("Reason", "Word filter");
+            embed.addFields([{ name: "Deleted by", value: `${client.user} ${client.user.tag}` }]);
+            embed.addFields([{ name: "Reason", value: "Word filter" }]);
             msg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
-        } else if (msg.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
+        } else if (msg.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const logMsg = await msg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
             const timestamp = Date.now();
             await sleep(800);
-            const logs = await msg.guild.fetchAuditLogs({ type: "MESSAGE_DELETE", limit: 1 });
+            const logs = await msg.guild.fetchAuditLogs({ type: AuditLogEvent.MessageDelete, limit: 1 });
             if (logs.entries.first()) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addField("Deleted by", `${log.executor} ${log.executor.tag}`);
+                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${log.executor.tag}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addField("Reason", log.reason);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
                     logMsg.edit({ embeds: [embed] });
                 }
             }
@@ -93,7 +93,7 @@ async function messageDelete(msg) {
  * @param {Message} newMsg 
  */
 async function messageUpdate(oldMsg, newMsg) {
-    if (newMsg.channel.type === "DM") return;
+    if (newMsg.channel.type === ChannelType.DM) return;
 
     const guildSettings = client.guildSettings.get(newMsg.guild.id);
 
@@ -101,18 +101,18 @@ async function messageUpdate(oldMsg, newMsg) {
         if (newMsg.channel.topic && newMsg.channel.topic.includes("[NO-LOGS]")) return;
         if (newMsg.partial) await newMsg.fetch();
         if (newMsg.author.bot) return;
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
 
-        embed.setAuthor({ name: "Message Edited", iconURL: newMsg.author.displayAvatarURL({ dynamic: true }) });
+        embed.setAuthor({ name: "Message Edited", iconURL: newMsg.author.displayAvatarURL() });
         embed.setDescription(`[Jump to Message](${newMsg.url})`);
         embed.setColor(colors.BLUE);
 
-        embed.addField("Author", `${newMsg.author} ${newMsg.author.tag}`, true);
-        embed.addField("Channel", `${newMsg.channel}`, true);
+        embed.addFields([{ name: "Author", value: `${newMsg.author} ${newMsg.author.tag}`, inline: true }]);
+        embed.addFields([{ name: "Channel", value: `${newMsg.channel}`, inline: true }]);
 
         if (!oldMsg.partial) {
-            embed.addField("Before", oldMsg.content ? truncate(oldMsg.content, 300, 4) : "None");
-            embed.addField("After", newMsg.content ? truncate(newMsg.content, 300, 4) : "None");
+            embed.addFields([{ name: "Before", value: oldMsg.content ? truncate(oldMsg.content, 300, 4) : "None" }]);
+            embed.addFields([{ name: "After", value: newMsg.content ? truncate(newMsg.content, 300, 4) : "None" }]);
         }
 
         embed.setFooter({ text: `ID: ${newMsg.id}` });

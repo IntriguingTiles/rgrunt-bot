@@ -1,6 +1,6 @@
-const { Client, CommandInteraction, MessageEmbed, Constants, ButtonInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, ButtonInteraction, PermissionsBitField, ButtonStyle, ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder, ContextMenuCommandBuilder, ActionRowBuilder, ButtonBuilder } = require("@discordjs/builders");
-const { ApplicationCommandType } = require("discord-api-types/v9");
+const { ApplicationCommandType } = require("discord-api-types/v10");
 const colors = require("../utils/colors.js");
 const moment = require("moment");
 
@@ -11,27 +11,29 @@ exports.commands = [
 		.addUserOption(option =>
 			option.setName("user")
 				.setDescription("The target user.")
-				.setRequired(true)),
+				.setRequired(true))
+		.setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
+		.setDMPermission(false),
 	new ContextMenuCommandBuilder()
 		.setName("View Info")
 		.setType(ApplicationCommandType.User)
+		.setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers)
+		.setDMPermission(false)
 ];
 
-exports.requireMod = true;
-
 /**
- * @param {Client} client
- * @param {CommandInteraction} intr
+ * @param {import("../types").ClientExt} client
+ * @param {ChatInputCommandInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.run = async (client, intr) => {
 	try {
 		const member = intr.options.getMember("user");
-		const embed = new MessageEmbed();
+		const embed = new EmbedBuilder();
 
-		embed.setAuthor({ name: "Member Info", iconURL: member.user.displayAvatarURL({ dynamic: true }) });
-		embed.addField("Account Created", `${moment(member.user.createdTimestamp).fromNow()}`);
-		embed.setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
+		embed.setAuthor({ name: "Member Info", iconURL: member.user.displayAvatarURL() });
+		embed.addFields([{ name: "Account Created", value: `${moment(member.user.createdTimestamp).fromNow()}` }]);
+		embed.setThumbnail(member.user.displayAvatarURL());
 		embed.setColor(colors.GREEN);
 		embed.setDescription(`${member.user} ${member.user.tag}`);
 		embed.setFooter({ text: `ID: ${member.id}` });
@@ -42,7 +44,7 @@ exports.run = async (client, intr) => {
 				new ButtonBuilder()
 					.setCustomId(member.id)
 					.setLabel("Verify")
-					.setStyle(Constants.MessageButtonStyles.PRIMARY)]
+					.setStyle(ButtonStyle.Primary)]
 			).toJSON();
 
 		intr.reply({
@@ -57,14 +59,14 @@ exports.run = async (client, intr) => {
 };
 
 /**
- * @param {Client} client
+ * @param {import("../types").ClientExt} client
  * @param {ButtonInteraction} intr
  * @param {import("../types").Settings} guildSettings
  */
 exports.buttonPress = async (client, intr, guildSettings) => {
 	if (!guildSettings.verifyRole) return intr.followUp({ content: "Use `/roleconfig verify` before using this command.", ephemeral: true });
 	if (!intr.guild.roles.cache.has(guildSettings.verifyRole)) return intr.followUp({ content: "The role used for verify no longer exists.", ephemeral: true });
-	if (!intr.guild.me.permissions.has("MANAGE_ROLES")) return intr.followUp({ content: "I don't have permission to manage roles.", ephemeral: true });
+	if (!intr.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) return intr.followUp({ content: "I don't have permission to manage roles.", ephemeral: true });
 
 	try {
 		const member = await intr.guild.members.fetch(intr.component.customId);
@@ -74,20 +76,19 @@ exports.buttonPress = async (client, intr, guildSettings) => {
 				new ButtonBuilder()
 					.setCustomId("verify_user")
 					.setLabel("Verified")
-					.setStyle(Constants.MessageButtonStyles.SUCCESS)
+					.setStyle(ButtonStyle.Success)
 					.setDisabled(true)
 			]
 			).toJSON();
 		await intr.update({ components: [row] });
 		intr.followUp(`Verified ${member}.`);
 	} catch (err) {
-		console.log(err);
 		const row = new ActionRowBuilder()
 			.addComponents([
 				new ButtonBuilder()
 					.setCustomId("verify_user")
 					.setLabel("Failed")
-					.setStyle(Constants.MessageButtonStyles.DANGER)
+					.setStyle(ButtonStyle.Danger)
 					.setDisabled(true)
 			]
 			).toJSON();

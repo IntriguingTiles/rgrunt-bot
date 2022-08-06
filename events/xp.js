@@ -1,11 +1,11 @@
-const { Client, Message } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Message, PermissionsBitField, ChannelType } = require("discord.js"); // eslint-disable-line no-unused-vars
 const xp = require("../utils/xp.js");
 
-/** @type {Client} */
+/** @type {import("../types").ClientExt} */
 let client;
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.register = c => {
     client = c;
@@ -13,7 +13,7 @@ exports.register = c => {
 };
 
 /**
- * @param {Client} c
+ * @param {import("../types").ClientExt} c
  */
 exports.deregister = c => {
     c.removeListener("messageCreate", messageCreate);
@@ -25,16 +25,15 @@ const cooldowns = new Set();
  * @param {Message} msg
  */
 async function messageCreate(msg) {
-    if (msg.channel.type === "DM") return;
+    if (msg.channel.type === ChannelType.DM) return;
     if (msg.author.bot) return;
     if (msg.system) return;
     if (msg.content.length === 0) return;
     if (msg.channel.topic && msg.channel.topic.includes("[NO-XP]")) return;
     if (cooldowns.has(msg.author.id)) return;
-    
-    /** @type {import("../types").Settings} */
+
     const guildSettings = client.guildSettings.get(msg.guild.id);
-    
+
     if (!guildSettings.levelSystem) return;
     if (guildSettings.verifyRole && !msg.member.roles.cache.has(guildSettings.verifyRole)) return;
     if (guildSettings.jailRole && msg.member.roles.cache.has(guildSettings.jailRole)) return;
@@ -46,11 +45,11 @@ async function messageCreate(msg) {
     const newLevel = xp.levelFromXP(level.xp);
 
     if (newLevel > prevLevel) {
-        if (msg.guild.me.permissions.has("MANAGE_ROLES")) {
+        if (msg.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
             guildSettings.levelRoles.filter(l => l.level <= newLevel && msg.guild.roles.cache.has(l.id)).forEach(l => {
                 const role = msg.guild.roles.cache.get(l.id);
 
-                if (!msg.member.roles.cache.has(l.id) && msg.guild.me.roles.highest.position >= role.position) {
+                if (!msg.member.roles.cache.has(l.id) && msg.guild.members.me.roles.highest.position >= role.position) {
                     msg.member.roles.add(role, "Role rewards");
                 }
             });
