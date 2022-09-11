@@ -30,7 +30,7 @@ async function guildMemberAdd(member) {
     }
 
     if (guildSettings.levels.filter(l => l.id === member.id).length !== 0) {
-        if (member.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
+        if (member.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
             const level = xp.levelFromXP(guildSettings.levels.filter(l => l.id === member.id)[0].xp);
 
             guildSettings.levelRoles.filter(l => l.level <= level && member.guild.roles.cache.has(l.id)).forEach(l => {

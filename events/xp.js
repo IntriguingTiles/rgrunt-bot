@@ -45,7 +45,7 @@ async function messageCreate(msg) {
     const newLevel = xp.levelFromXP(level.xp);
 
     if (newLevel > prevLevel) {
-        if (msg.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
+        if (msg.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
             guildSettings.levelRoles.filter(l => l.level <= newLevel && msg.guild.roles.cache.has(l.id)).forEach(l => {
                 const role = msg.guild.roles.cache.get(l.id);
 
