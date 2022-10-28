@@ -39,7 +39,8 @@ exports.deregister = c => {
 async function guildMemberAdd(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.JOIN && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.JOIN && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) &&
+        member.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(member.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Member Joined", iconURL: member.user.displayAvatarURL() });
@@ -62,7 +63,8 @@ async function guildMemberUpdate(oldMember, newMember) {
     const guildSettings = client.guildSettings.get(newMember.guild.id);
     const timestamp = Date.now();
 
-    if (guildSettings.logFlags & flags.logs.USER && guildSettings.logChannel && newMember.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.USER && guildSettings.logChannel && newMember.guild.channels.cache.has(guildSettings.logChannel) &&
+        newMember.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(newMember.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         // i'm not sure if we get member update events for boosts so we're doing this
@@ -131,7 +133,8 @@ async function guildMemberUpdate(oldMember, newMember) {
 async function guildMemberRemove(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.LEAVE && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.LEAVE && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) &&
+        member.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(member.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Member Left", iconURL: member.user.displayAvatarURL() });
@@ -154,7 +157,8 @@ async function guildMemberRemove(member) {
 async function guildMemberKick(member) {
     const guildSettings = client.guildSettings.get(member.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) && member.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
+    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) &&
+        member.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(member.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks) && member.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
         const timestamp = Date.now();
         await sleep(900);
         await member.user.fetch();

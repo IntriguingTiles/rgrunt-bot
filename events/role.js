@@ -32,7 +32,8 @@ exports.deregister = c => {
 async function roleCreate(role) {
     const guildSettings = client.guildSettings.get(role.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && role.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && role.guild.channels.cache.has(guildSettings.logChannel) &&
+        role.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(role.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Role Created", iconURL: role.guild.iconURL() });
@@ -70,7 +71,8 @@ async function roleCreate(role) {
 async function roleUpdate(oldRole, newRole) {
     const guildSettings = client.guildSettings.get(newRole.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && newRole.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && newRole.guild.channels.cache.has(guildSettings.logChannel) &&
+        newRole.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(newRole.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
         let shouldPost = false;
 
@@ -151,7 +153,8 @@ async function roleUpdate(oldRole, newRole) {
 async function roleDelete(role) {
     const guildSettings = client.guildSettings.get(role.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && role.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.ROLE && guildSettings.logChannel && role.guild.channels.cache.has(guildSettings.logChannel) &&
+        role.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(role.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Role Deleted", iconURL: role.guild.iconURL() });

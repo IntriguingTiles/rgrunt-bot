@@ -32,7 +32,8 @@ exports.deregister = c => {
 async function emojiCreate(emoji) {
     const guildSettings = client.guildSettings.get(emoji.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel) &&
+        emoji.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(emoji.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Emoji Created", iconURL: emoji.guild.iconURL() });
@@ -72,7 +73,8 @@ async function emojiCreate(emoji) {
 async function emojiUpdate(oldEmoji, newEmoji) {
     const guildSettings = client.guildSettings.get(newEmoji.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && newEmoji.guild.channels.cache.has(guildSettings.logChannel) && oldEmoji.name !== newEmoji.name) {
+    if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && newEmoji.guild.channels.cache.has(guildSettings.logChannel) &&
+        newEmoji.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(newEmoji.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks) && oldEmoji.name !== newEmoji.name) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Emoji Updated", iconURL: newEmoji.guild.iconURL() });
@@ -107,7 +109,8 @@ async function emojiUpdate(oldEmoji, newEmoji) {
 async function emojiDelete(emoji) {
     const guildSettings = client.guildSettings.get(emoji.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.EMOJI && guildSettings.logChannel && emoji.guild.channels.cache.has(guildSettings.logChannel) &&
+        emoji.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(emoji.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Emoji Deleted", iconURL: emoji.guild.iconURL() });

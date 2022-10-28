@@ -33,7 +33,8 @@ async function channelCreate(ch) {
     if (ch.type === ChannelType.DM) return;
     const guildSettings = client.guildSettings.get(ch.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel) &&
+        ch.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(ch.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Channel Created", iconURL: ch.guild.iconURL() });
@@ -71,7 +72,8 @@ async function channelUpdate(oldCh, newCh) {
     if (newCh.type === ChannelType.DM) return;
     const guildSettings = client.guildSettings.get(newCh.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && newCh.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && newCh.guild.channels.cache.has(guildSettings.logChannel) &&
+        newCh.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(newCh.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         if (newCh.topic && newCh.topic.includes("[NO-LOGS]")) return;
         const embed = new EmbedBuilder();
         let shouldPost = false;
@@ -124,7 +126,8 @@ async function channelDelete(ch) {
     if (ch.type === ChannelType.DM) return;
     const guildSettings = client.guildSettings.get(ch.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.CHANNEL && guildSettings.logChannel && ch.guild.channels.cache.has(guildSettings.logChannel) &&
+        ch.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(ch.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Channel Deleted", iconURL: ch.guild.iconURL() });

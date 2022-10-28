@@ -33,7 +33,8 @@ async function messageDelete(msg) {
 
     const guildSettings = client.guildSettings.get(msg.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.DELETE && guildSettings.logChannel && msg.guild.channels.cache.has(guildSettings.logChannel)) {
+    if (guildSettings.logFlags & flags.logs.DELETE && guildSettings.logChannel && msg.guild.channels.cache.has(guildSettings.logChannel) &&
+        msg.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(msg.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
         if (msg.channel.topic && msg.channel.topic.includes("[NO-LOGS]")) return;
 
         const embed = new EmbedBuilder();
@@ -97,7 +98,8 @@ async function messageUpdate(oldMsg, newMsg) {
 
     const guildSettings = client.guildSettings.get(newMsg.guild.id);
 
-    if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) && oldMsg.content !== newMsg.content) {
+    if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) &&
+        newMsg.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(newMsg.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks) && oldMsg.content !== newMsg.content) {
         if (newMsg.channel.topic && newMsg.channel.topic.includes("[NO-LOGS]")) return;
         if (newMsg.partial) await newMsg.fetch();
         if (newMsg.author.bot) return;
