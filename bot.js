@@ -99,6 +99,17 @@ client.on("interactionCreate", async intr => {
     }
 });
 
+client.on("interactionCreate", async intr => {
+    if (intr.type !== Discord.InteractionType.ApplicationCommandAutocomplete) return;
+    const cmd = intr.commandName;
+    if (!(cmd in client.commands)) return;
+    if (!intr.inGuild()) return;
+
+    const guildSettings = client.guildSettings.ensure(intr.guild.id, defaultSettings);
+
+    client.commands[cmd].autocomplete(client, intr, guildSettings);
+});
+
 process.on("SIGINT", async () => {
     client.guildSettings.close();
     await client.destroy();
