@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { ChatInputCommandInteraction, PermissionsBitField, AutocompleteInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder } = require("@discordjs/builders");
 
 exports.commands = [
@@ -21,6 +21,7 @@ exports.commands = [
                 .addStringOption(option =>
                     option.setName("word")
                         .setDescription("The word to remove from the filter.")
+                        .setAutocomplete(true)
                         .setRequired(true)))
         .addSubcommand(cmd =>
             cmd.setName("show")
@@ -86,4 +87,13 @@ exports.run = async (client, intr, guildSettings) => {
             break;
         }
     }
+};
+
+/**
+ * @param {Client} client 
+ * @param {AutocompleteInteraction} intr 
+ * @param {import("../types").Settings} guildSettings
+ */
+exports.autocomplete = async (client, intr, guildSettings) => {
+    intr.respond(guildSettings.badNames.map(v => v[0].toLowerCase()).filter(v => v.startsWith(intr.options.getFocused().toLowerCase())).map(v => ({ name: v, value: v })));
 };
