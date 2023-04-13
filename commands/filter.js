@@ -18,6 +18,7 @@ exports.commands = [
                 .addStringOption(option =>
                     option.setName("word")
                         .setDescription("The word to remove from the filter.")
+                        .setAutocomplete(true)
                         .setRequired(true)))
         .addSubcommand(cmd =>
             cmd.setName("show")
@@ -64,4 +65,13 @@ exports.run = async (client, intr, guildSettings) => {
             break;
         }
     }
+};
+
+/**
+ * @param {Client} client 
+ * @param {AutocompleteInteraction} intr 
+ * @param {import("../types").Settings} guildSettings
+ */
+exports.autocomplete = async (client, intr, guildSettings) => {
+    intr.respond(guildSettings.badWords.filter(v => v.toLowerCase().startsWith(intr.options.getFocused().toLowerCase())).map(v => ({ name: v, value: v })));
 };
