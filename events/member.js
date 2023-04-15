@@ -1,4 +1,4 @@
-const { GuildMember, EmbedBuilder, Guild, User, GuildBan, PermissionsBitField, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { GuildMember, EmbedBuilder, Guild, User, GuildBan, PermissionsBitField, AuditLogEvent, GuildAuditLogsEntry } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -16,7 +16,7 @@ exports.register = c => {
     c.on("guildMemberAdd", guildMemberAdd);
     c.on("guildMemberUpdate", guildMemberUpdate);
     c.on("guildMemberRemove", guildMemberRemove);
-    c.on("guildMemberRemove", guildMemberKick);
+    c.on("guildAuditLogEntryCreate", guildMemberKick);
     c.on("guildBanAdd", guildBanAdd);
     c.on("guildBanRemove", guildBanRemove);
 };
@@ -28,7 +28,7 @@ exports.deregister = c => {
     c.removeListener("guildMemberAdd", guildMemberAdd);
     c.removeListener("guildMemberUpdate", guildMemberUpdate);
     c.removeListener("guildMemberRemove", guildMemberRemove);
-    c.removeListener("guildMemberRemove", guildMemberKick);
+    c.removeListener("guildAuditLogEntryCreate", guildMemberKick);
     c.removeListener("guildBanAdd", guildBanAdd);
     c.removeListener("guildBanRemove", guildBanRemove);
 };
@@ -152,37 +152,31 @@ async function guildMemberRemove(member) {
 }
 
 /**
- * @param {GuildMember} member 
+ * @param {GuildAuditLogsEntry} entry
+ * @param {Guild} guild 
  */
-async function guildMemberKick(member) {
-    const guildSettings = client.guildSettings.get(member.guild.id);
+async function guildMemberKick(entry, guild) {
+    const guildSettings = client.guildSettings.get(guild.id);
 
-    if (guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && member.guild.channels.cache.has(guildSettings.logChannel) &&
-        member.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(member.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks) && member.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
-        const timestamp = Date.now();
-        await sleep(900);
-        await member.user.fetch();
+    if (entry.action === AuditLogEvent.MemberKick && guildSettings.logFlags & flags.logs.KICK && guildSettings.logChannel && guild.channels.cache.has(guildSettings.logChannel) &&
+        guild.channels.cache.get(guildSettings.logChannel).permissionsFor(guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks)) {
+        /** @type {User} */
+        const user = entry.target;
+        await user.fetch();
 
         const embed = new EmbedBuilder();
-        const logs = await member.guild.fetchAuditLogs({ type: AuditLogEvent.MemberKick, limit: 1 });
-
-        embed.setAuthor({ name: "Member Kicked", iconURL: member.user.displayAvatarURL() });
-        embed.setThumbnail(member.user.displayAvatarURL());
+        embed.setAuthor({ name: "Member Kicked", iconURL: user.displayAvatarURL() });
+        embed.setThumbnail(user.displayAvatarURL());
         embed.setColor(colors.ORANGE);
-        embed.addFields([{ name: "Member", value: `${member.user} ${member.user.tag}`, inline: true }]);
+        embed.addFields([{ name: "Member", value: `${user} ${user.tag}`, inline: true }]);
+        embed.addFields([{ name: "Kicked by", value: `${entry.executor} ${entry.executor.tag}`, inline: true }]);
 
-        if (logs.entries.first() && logs.entries.first().target.id === member.user.id && Math.abs(timestamp - logs.entries.first().createdTimestamp) < 1400) {
-            const log = logs.entries.first();
-            embed.addFields([{ name: "Kicked by", value: `${log.executor} ${log.executor.tag}`, inline: true }]);
-            if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
-        } else {
-            return;
-        }
+        if (entry.reason) embed.addFields([{ name: "Reason", value: entry.reason }]);
 
-        embed.setFooter({ text: `ID: ${member.user.id}` });
+        embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
 
-        member.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
+        guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
     }
 }
 
