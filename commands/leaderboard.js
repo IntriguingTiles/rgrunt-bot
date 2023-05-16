@@ -34,7 +34,7 @@ exports.run = async (client, intr, guildSettings) => {
 
 	for (const entry of topTen) {
 		if (entry.id === user.id) {
-			reply += `**${position}. Level ${xp.levelFromXP(entry.xp)}: ${(await client.users.fetch(entry.id)).tag}**\n`;
+			reply += `\n**${position}. Level ${xp.levelFromXP(entry.xp)}: ${(await client.users.fetch(entry.id)).tag}**\n`;
 			present = true;
 		} else {
 			reply += `${position}. Level ${xp.levelFromXP(entry.xp)}: ${(await client.users.fetch(entry.id)).tag}\n`;
