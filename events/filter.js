@@ -74,6 +74,21 @@ async function messageUpdate(oldMsg, newMsg) {
  * @param {GuildMember} member
  */
 async function guildMemberAdd(member) {
+    nicknameCheck(member);
+}
+
+/**
+ * @param {GuildMember} oldMember 
+ * @param {GuildMember} newMember 
+ */
+async function guildMemberUpdate(oldMember, newMember) {
+    nicknameCheck(newMember);
+}
+
+/**
+ * @param {GuildMember} member 
+ */
+async function nicknameCheck(member) {
     if (!member.manageable) return;
     if (!client.badNames.has(member.guild.id)) return;
 
@@ -96,38 +111,6 @@ async function guildMemberAdd(member) {
                 }
 
                 member.setNickname(finalName, "Name filter");
-            }
-        }
-    });
-}
-
-/**
- * @param {GuildMember} oldMember 
- * @param {GuildMember} newMember 
- */
-async function guildMemberUpdate(oldMember, newMember) {
-    if (!newMember.manageable) return;
-    if (!client.badNames.has(newMember.guild.id)) return;
-
-    const badNames = client.badNames.get(newMember.guild.id);
-
-    badNames.forEach(name => {
-        if (newMember.displayName.match(name[0])) {
-            if (name[1]) newMember.setNickname(name[1]);
-            else {
-                let finalName = newMember.displayName.replace(name[0], "").trim();
-
-                while (finalName.match(name[0])) {
-                    finalName = finalName.replace(name[0], "").trim();
-                }
-
-                if (finalName.trim().length === 0) {
-                    if (newMember.user.username.match(name[0])) newMember.setNickname("unnamed", "Name filter");
-                    else newMember.setNickname("", "Name filter");
-                    return;
-                }
-
-                newMember.setNickname(finalName, "Name filter");
             }
         }
     });
