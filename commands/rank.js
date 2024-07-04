@@ -62,8 +62,7 @@ exports.run = async (client, intr, guildSettings) => {
 async function generateCard(user, totalXP, levels, statusColor) {
     const canvas = createCanvas(886, 210);
     const pfp = await loadImage(user.displayAvatarURL({ extension: "png" }));
-    let username = user.username;
-    const discrim = user.discriminator;
+    let username = user.displayName;
     const level = xp.levelFromXP(totalXP);
     const curXP = xp.totalXPToLevelXP(totalXP);
     const nextXP = xp.xpForNextLevel(level);
@@ -145,14 +144,9 @@ async function generateCard(user, totalXP, levels, statusColor) {
 
     ctx.fillText(username, 251, infoY);
 
-    // draw tag
+    // draw total xp
     ctx.font = "28px Calibri";
     ctx.fillStyle = "#7F8384";
-    if (usernameLength.width < 330) {
-        ctx.fillText(`#${discrim}`, 251 + usernameLength.width + 12, infoY);
-    }
-
-    // draw total xp
     const totalXPLength = ctx.measureText(`/ ${shorten(nextXP)} XP`);
     ctx.fillText(`/ ${shorten(nextXP)} XP`, 856 - totalXPLength.width, infoY);
 
