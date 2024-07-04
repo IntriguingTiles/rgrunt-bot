@@ -71,6 +71,11 @@ async function messageDelete(msg) {
             embed.addFields([{ name: "Deleted by", value: `${client.user} ${client.user.tag}` }]);
             embed.addFields([{ name: "Reason", value: "Word filter" }]);
             msg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
+
+            if (msg.guild.id === "154305477323390976") {
+                const ch = await msg.guild.channels.fetch("970048913706987540");
+                ch.send({ embeds: [embed] });
+            }
         } else if (msg.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) {
             const logMsg = await msg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
             const timestamp = Date.now();
