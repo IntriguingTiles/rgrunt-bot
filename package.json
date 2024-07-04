@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/IntriguingTiles/rgrunt-bot#readme",
   "dependencies": {
-    "better-sqlite3": "^7.1.1",
+    "better-sqlite3": "^9.4.3",
     "bufferutil": "^4.0.2",
     "canvas": "^2.8.0",
     "discord-api-types": "^0.37.1",
@@ -29,7 +29,7 @@
     "node-fetch": "^2.6.6",
     "numeral": "^2.0.6",
     "re2": "^1.17.1",
-    "utf-8-validate": "^5.0.3",
+    "utf-8-validate": "^6.0.4",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
