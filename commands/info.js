@@ -32,7 +32,8 @@ exports.run = async (client, intr) => {
 		const embed = new EmbedBuilder();
 
 		embed.setAuthor({ name: "Member Info", iconURL: member.user.displayAvatarURL() });
-		embed.addFields([{ name: "Account Created", value: `${moment(member.user.createdTimestamp).fromNow()}` }]);
+		embed.addFields([{ name: "Created", value: `${moment(member.user.createdTimestamp).fromNow()}`, inline: true }]);
+		embed.addFields([{ name: "Joined", value: `${moment(member.joinedTimestamp).fromNow()}`, inline: true }]);
 		embed.setThumbnail(member.user.displayAvatarURL());
 		embed.setColor(colors.GREEN);
 		embed.setDescription(`${member.user} ${member.user.tag}`);
