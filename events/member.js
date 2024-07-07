@@ -1,4 +1,5 @@
 const { GuildMember, EmbedBuilder, Guild, User, GuildBan, PermissionsBitField, AuditLogEvent, GuildAuditLogsEntry } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { time, TimestampStyles } = require("@discordjs/formatters");
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -44,7 +45,7 @@ async function guildMemberAdd(member) {
         const embed = new EmbedBuilder();
 
         embed.setAuthor({ name: "Member Joined", iconURL: member.user.displayAvatarURL() });
-        embed.addFields([{ name: "Account Created", value: `${moment(member.user.createdTimestamp).fromNow()}` }]);
+        embed.addFields([{ name: "Account Created", value: `${time(member.user.createdAt, TimestampStyles.RelativeTime)}` }]);
         embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.GREEN);
         embed.setDescription(`${member.user} ${member.user.tag}`);

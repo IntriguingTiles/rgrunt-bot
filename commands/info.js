@@ -1,5 +1,6 @@
 const { EmbedBuilder, ButtonInteraction, PermissionsBitField, ButtonStyle, ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder, ContextMenuCommandBuilder, ActionRowBuilder, ButtonBuilder } = require("@discordjs/builders");
+const { time, TimestampStyles } = require("@discordjs/formatters");
 const { ApplicationCommandType } = require("discord-api-types/v10");
 const colors = require("../utils/colors.js");
 const moment = require("moment");
@@ -32,8 +33,8 @@ exports.run = async (client, intr) => {
 		const embed = new EmbedBuilder();
 
 		embed.setAuthor({ name: "Member Info", iconURL: member.user.displayAvatarURL() });
-		embed.addFields([{ name: "Created", value: `${moment(member.user.createdTimestamp).fromNow()}`, inline: true }]);
-		embed.addFields([{ name: "Joined", value: `${moment(member.joinedTimestamp).fromNow()}`, inline: true }]);
+		embed.addFields([{ name: "Created", value: `${time(member.user.createdAt, TimestampStyles.RelativeTime)}`, inline: true }]);
+		embed.addFields([{ name: "Joined", value: `${time(member.joinedAt, TimestampStyles.RelativeTime)}`, inline: true }]);
 		embed.setThumbnail(member.user.displayAvatarURL());
 		embed.setColor(colors.GREEN);
 		embed.setDescription(`${member.user} ${member.user.tag}`);
