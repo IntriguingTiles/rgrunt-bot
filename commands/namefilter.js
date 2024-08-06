@@ -56,11 +56,11 @@ exports.run = async (client, intr, guildSettings) => {
                 if (!member.manageable) return;
                 badNames.forEach(name => {
                     if (member.displayName.match(name[0])) {
-                        if (name[1]) member.setNickname(name[1]);
+                        if (name[1]) member.setNickname(name[1], "Name filter");
                         else {
-                            if (member.displayName.replace(name[0], "").trim().length === 0 && member.user.username.match(name[0])) member.setNickname("unnamed");
-                            else if (member.displayName.replace(name[0], "").trim().length === 0) member.setNickname("");
-                            else member.setNickname(member.displayName.replace(name[0], ""));
+                            if (member.displayName.replace(name[0], "").trim().length === 0 && member.user.username.match(name[0])) member.setNickname("unnamed", "Name filter");
+                            else if (member.displayName.replace(name[0], "").trim().length === 0) member.setNickname("", "Name filter");
+                            else member.setNickname(member.displayName.replace(name[0], ""), "Name filter");
                         }
                     }
                 });

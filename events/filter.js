@@ -96,7 +96,7 @@ async function nicknameCheck(member) {
 
     badNames.forEach(name => {
         if (member.displayName.match(name[0])) {
-            if (name[1]) member.setNickname(name[1]);
+            if (name[1]) member.setNickname(name[1], "Name filter");
             else {
                 let finalName = member.displayName.replace(name[0], "").trim();
 
