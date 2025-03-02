@@ -1,4 +1,4 @@
-const { EmbedBuilder, Guild, PermissionsBitField, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, Guild, PermissionsBitField, AuditLogEvent, escapeMarkdown } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -56,8 +56,8 @@ async function guildUpdate(oldGuild, newGuild) {
             if (logs.entries.first()) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }

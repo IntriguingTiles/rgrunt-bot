@@ -1,4 +1,4 @@
-const { Role, EmbedBuilder, PermissionsBitField, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { Role, EmbedBuilder, PermissionsBitField, AuditLogEvent, escapeMarkdown } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -53,9 +53,9 @@ async function roleCreate(role) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Created by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Created by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -136,9 +136,9 @@ async function roleUpdate(oldRole, newRole) {
             if (logs.entries.first() && logs.entries.first().target.id === newRole.id) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Changed by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Changed by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -173,9 +173,9 @@ async function roleDelete(role) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }

@@ -1,4 +1,4 @@
-const { EmbedBuilder, GuildChannel, PermissionsBitField, AuditLogEvent, ChannelType } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, GuildChannel, PermissionsBitField, AuditLogEvent, ChannelType, escapeMarkdown } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -53,9 +53,9 @@ async function channelCreate(ch) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Created by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Created by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -108,9 +108,9 @@ async function channelUpdate(oldCh, newCh) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -146,9 +146,9 @@ async function channelDelete(ch) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }

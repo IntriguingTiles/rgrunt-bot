@@ -1,4 +1,4 @@
-const { GuildMember, EmbedBuilder, Guild, User, GuildBan, PermissionsBitField, AuditLogEvent, GuildAuditLogsEntry } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { GuildMember, EmbedBuilder, Guild, User, GuildBan, PermissionsBitField, AuditLogEvent, GuildAuditLogsEntry, escapeMarkdown } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { time, TimestampStyles } = require("@discordjs/formatters");
 
 const flags = require("../utils/flags.js");
@@ -48,7 +48,7 @@ async function guildMemberAdd(member) {
         embed.addFields([{ name: "Account Created", value: `${time(member.user.createdAt, TimestampStyles.RelativeTime)}` }]);
         embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.GREEN);
-        embed.setDescription(`${member.user} ${member.user.tag}`);
+        embed.setDescription(`${member.user} ${escapeMarkdown(member.user.tag)}`);
         embed.setFooter({ text: `ID: ${member.id}` });
         embed.setTimestamp();
 
@@ -73,7 +73,7 @@ async function guildMemberUpdate(oldMember, newMember) {
 
         embed.setAuthor({ name: "Member Updated", iconURL: newMember.user.displayAvatarURL() });
         embed.setColor(colors.BLUE);
-        embed.addFields([{ name: "Member", value: `${newMember.user} ${newMember.user.tag}` }]);
+        embed.addFields([{ name: "Member", value: `${newMember.user} ${escapeMarkdown(newMember.user.tag)}` }]);
 
         if (oldMember.nickname !== newMember.nickname) {
             embed.addFields([{ name: "Nickname", value: `${oldMember.nickname ? `\`${oldMember.nickname}\`` : "None"} → ${newMember.nickname ? `\`${newMember.nickname}\`` : "None"}`, inline: true }]);
@@ -119,8 +119,8 @@ async function guildMemberUpdate(oldMember, newMember) {
             if (logs.entries.first() && logs.entries.first().target.id === newMember.id && logs.entries.first().executor.id !== newMember.id) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -144,7 +144,7 @@ async function guildMemberRemove(member) {
 
         embed.setThumbnail(member.user.displayAvatarURL());
         embed.setColor(colors.ORANGE);
-        embed.setDescription(`${member.user} ${member.user.tag}`);
+        embed.setDescription(`${member.user} ${escapeMarkdown(member.user.tag)}`);
         embed.setFooter({ text: `ID: ${member.id}` });
         embed.setTimestamp();
 
@@ -169,10 +169,10 @@ async function guildMemberKick(entry, guild) {
         embed.setAuthor({ name: "Member Kicked", iconURL: user.displayAvatarURL() });
         embed.setThumbnail(user.displayAvatarURL());
         embed.setColor(colors.ORANGE);
-        embed.addFields([{ name: "Member", value: `${user} ${user.tag}`, inline: true }]);
-        embed.addFields([{ name: "Kicked by", value: `${entry.executor} ${entry.executor.tag}`, inline: true }]);
+        embed.addFields([{ name: "Member", value: `${user} ${escapeMarkdown(user.tag)}`, inline: true }]);
+        embed.addFields([{ name: "Kicked by", value: `${entry.executor} ${escapeMarkdown(entry.executor.tag)}`, inline: true }]);
 
-        if (entry.reason) embed.addFields([{ name: "Reason", value: entry.reason }]);
+        if (entry.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(entry.reason) }]);
 
         embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
@@ -197,7 +197,7 @@ async function guildBanAdd(ban) {
         embed.setAuthor({ name: "Member Banned", iconURL: user.displayAvatarURL() });
         embed.setThumbnail(user.displayAvatarURL());
         embed.setColor(colors.ORANGE);
-        embed.addFields([{ name: "Member", value: `${user} ${user.tag}`, inline: true }]);
+        embed.addFields([{ name: "Member", value: `${user} ${escapeMarkdown(user.tag)}`, inline: true }]);
         embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
 
@@ -210,8 +210,8 @@ async function guildBanAdd(ban) {
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Banned by", value: `${log.executor} ${log.executor.tag}`, inline: true }]);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    embed.addFields([{ name: "Banned by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}`, inline: true }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -235,7 +235,7 @@ async function guildBanRemove(ban) {
         embed.setAuthor({ name: "Member Unbanned", iconURL: user.displayAvatarURL() });
         embed.setThumbnail(user.displayAvatarURL());
         embed.setColor(colors.GREEN);
-        embed.addFields([{ name: "Member", value: `${user} ${user.tag}`, inline: true }]);
+        embed.addFields([{ name: "Member", value: `${user} ${escapeMarkdown(user.tag)}`, inline: true }]);
 
         embed.setFooter({ text: `ID: ${user.id}` });
         embed.setTimestamp();
@@ -249,8 +249,8 @@ async function guildBanRemove(ban) {
             if (logs.entries.first() && logs.entries.first().target.id === user.id) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Unbanned by", value: `${log.executor} ${log.executor.tag}`, inline: true }]);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    embed.addFields([{ name: "Unbanned by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}`, inline: true }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }

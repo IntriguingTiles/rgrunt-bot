@@ -35,7 +35,7 @@ exports.run = async (client, intr) => {
             if (m.content.toLocaleLowerCase() === "no") return collector.stop();
             if (m.content.toLocaleLowerCase() === "yes") {
                 kicking = true;
-                const reason = intr.options.getString("reason", false) ? `${intr.options.getString("reason", false)} (initiated by ${intr.user.tag})` : `Initiated by ${intr.user.tag}`;
+                const reason = intr.options.getString("reason", false) ? `${intr.options.getString("reason", false)} (initiated by ${intr.user.tag} (${intr.user.id}))` : `Initiated by ${intr.user.tag} (${intr.user.id})`;
                 intr.followUp(`Kicking ${intr.guild.members.cache.filter(m => m.joinedTimestamp >= member.joinedTimestamp).size} members, this might take a while.`);
                 intr.guild.members.cache.filter(m => m.joinedTimestamp >= member.joinedTimestamp).forEach(m => m.kick(reason));
                 collector.stop();

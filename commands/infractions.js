@@ -1,5 +1,5 @@
 const { ChatInputCommandInteraction, EmbedBuilder, PermissionsBitField } = require("discord.js"); // eslint-disable-line no-unused-vars
-const { SlashCommandBuilder, ContextMenuCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder, ContextMenuCommandBuilder, escapeMarkdown } = require("@discordjs/builders");
 const { ApplicationCommandType } = require("discord-api-types/v10");
 const colors = require("../utils/colors");
 
@@ -35,7 +35,7 @@ exports.run = async (client, intr, guildSettings) => {
 
     embed.setAuthor({ name: "Warns For", iconURL: user.displayAvatarURL() });
     embed.setColor(colors.RED);
-    embed.setDescription(`${user} ${user.tag}`);
+    embed.setDescription(`${user} ${escapeMarkdown(user.tag)}`);
     embed.setFooter({ text: `ID: ${user.id}` });
     embed.setTimestamp();
 

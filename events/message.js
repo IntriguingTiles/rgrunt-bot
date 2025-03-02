@@ -1,4 +1,4 @@
-const { EmbedBuilder, Message, PermissionsBitField, ChannelType, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, Message, PermissionsBitField, ChannelType, AuditLogEvent, escapeMarkdown } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -46,7 +46,7 @@ async function messageDelete(msg) {
             if (msg.author.bot) return;
 
             embed.setAuthor({ name: "Message Deleted", iconURL: msg.author.displayAvatarURL() });
-            embed.addFields([{ name: "Author", value: `${msg.author} ${msg.author.tag}`, inline: true }]);
+            embed.addFields([{ name: "Author", value: `${msg.author} ${escapeMarkdown(msg.author.tag)}`, inline: true }]);
             embed.addFields([{ name: "Channel", value: `${msg.channel}`, inline: true }]);
 
             if (msg.content.length !== 0) embed.addFields([{ name: "Contents", value: truncate(msg.content, 300, 8) }]);
@@ -68,7 +68,7 @@ async function messageDelete(msg) {
         embed.setTimestamp();
 
         if (msg.badWords) {
-            embed.addFields([{ name: "Deleted by", value: `${client.user} ${client.user.tag}` }]);
+            embed.addFields([{ name: "Deleted by", value: `${client.user} ${escapeMarkdown(client.user.tag)}` }]);
             embed.addFields([{ name: "Reason", value: "Word filter" }]);
             msg.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
@@ -84,9 +84,9 @@ async function messageDelete(msg) {
             if (logs.entries.first()) {
                 const log = logs.entries.first();
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     logMsg.edit({ embeds: [embed] });
                 }
             }
@@ -114,7 +114,7 @@ async function messageUpdate(oldMsg, newMsg) {
         embed.setDescription(`[Jump to Message](${newMsg.url})`);
         embed.setColor(colors.BLUE);
 
-        embed.addFields([{ name: "Author", value: `${newMsg.author} ${newMsg.author.tag}`, inline: true }]);
+        embed.addFields([{ name: "Author", value: `${newMsg.author} ${escapeMarkdown(newMsg.author.tag)}`, inline: true }]);
         embed.addFields([{ name: "Channel", value: `${newMsg.channel}`, inline: true }]);
 
         if (!oldMsg.partial) {

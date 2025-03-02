@@ -1,6 +1,6 @@
 
 const { ChatInputCommandInteraction, EmbedBuilder } = require("discord.js"); // eslint-disable-line no-unused-vars
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder, escapeMarkdown } = require("@discordjs/builders");
 const xp = require("../utils/xp.js");
 
 exports.commands = [
@@ -27,23 +27,22 @@ exports.run = async (client, intr, guildSettings) => {
 	const levels = guildSettings.levels.slice();
 	const topTen = levels.sort((a, b) => b.xp - a.xp).slice(0, 10);
 
-
 	let reply = "";
 	let position = 1;
 	let present = false;
 
 	for (const entry of topTen) {
 		if (entry.id === user.id) {
-			reply += `\n**${position}. Level ${xp.levelFromXP(entry.xp)}: ${(await client.users.fetch(entry.id)).tag}**\n`;
+			reply += `\n**${position}. Level ${xp.levelFromXP(entry.xp)}: ${escapeMarkdown((await client.users.fetch(entry.id)).tag)}**\n`;
 			present = true;
 		} else {
-			reply += `${position}. Level ${xp.levelFromXP(entry.xp)}: ${(await client.users.fetch(entry.id)).tag}\n`;
+			reply += `${position}. Level ${xp.levelFromXP(entry.xp)}: ${escapeMarkdown((await client.users.fetch(entry.id)).tag)}\n`;
 		}
 		position++;
 	}
 
 	if (!present) {
-		reply += `\n**${xp.rank(user.id, levels)}. Level ${xp.levelFromXP(guildSettings.levels.find(l => l.id === user.id).xp)}: ${(await client.users.fetch(user.id)).tag}**\n`;
+		reply += `\n**${xp.rank(user.id, levels)}. Level ${xp.levelFromXP(guildSettings.levels.find(l => l.id === user.id).xp)}: ${escapeMarkdown((await client.users.fetch(user.id)).tag)}**\n`;
 	}
 
 	const embed = new EmbedBuilder();

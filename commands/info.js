@@ -1,9 +1,8 @@
 const { EmbedBuilder, ButtonInteraction, PermissionsBitField, ButtonStyle, ChatInputCommandInteraction } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { SlashCommandBuilder, ContextMenuCommandBuilder, ActionRowBuilder, ButtonBuilder } = require("@discordjs/builders");
-const { time, TimestampStyles } = require("@discordjs/formatters");
+const { time, TimestampStyles, escapeMarkdown } = require("@discordjs/formatters");
 const { ApplicationCommandType } = require("discord-api-types/v10");
 const colors = require("../utils/colors.js");
-const moment = require("moment");
 
 exports.commands = [
 	new SlashCommandBuilder()
@@ -37,7 +36,7 @@ exports.run = async (client, intr) => {
 		embed.addFields([{ name: "Joined", value: `${time(member.joinedAt, TimestampStyles.RelativeTime)}`, inline: true }]);
 		embed.setThumbnail(member.user.displayAvatarURL());
 		embed.setColor(colors.GREEN);
-		embed.setDescription(`${member.user} ${member.user.tag}`);
+		embed.setDescription(`${member.user} ${escapeMarkdown(member.user.tag)}`);
 		embed.setFooter({ text: `ID: ${member.id}` });
 		embed.setTimestamp();
 
@@ -72,7 +71,7 @@ exports.buttonPress = async (client, intr, guildSettings) => {
 
 	try {
 		const member = await intr.guild.members.fetch(intr.component.customId);
-		await member.roles.add(guildSettings.verifyRole, `Verified by ${intr.user.tag}`);
+		await member.roles.add(guildSettings.verifyRole, `Verified by ${intr.user.tag} (${intr.user.id})`);
 		const row = new ActionRowBuilder()
 			.addComponents([
 				new ButtonBuilder()

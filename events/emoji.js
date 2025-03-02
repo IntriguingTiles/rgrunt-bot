@@ -1,4 +1,4 @@
-const { EmbedBuilder, GuildEmoji, PermissionsBitField, AuditLogEvent } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { EmbedBuilder, GuildEmoji, PermissionsBitField, AuditLogEvent, escapeMarkdown } = require("discord.js"); // eslint-disable-line no-unused-vars
 
 const flags = require("../utils/flags.js");
 const colors = require("../utils/colors.js");
@@ -43,7 +43,7 @@ async function emojiCreate(emoji) {
         embed.setFooter({ text: `ID: ${emoji.id}` });
         embed.setTimestamp();
 
-        if (!emoji.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) embed.addFields([{ name: "Created by", value: `${await emoji.fetchAuthor()} ${await emoji.fetchAuthor().tag}` }]);
+        if (!emoji.guild.members.me.permissions.has(PermissionsBitField.Flags.ViewAuditLog)) embed.addFields([{ name: "Created by", value: `${await emoji.fetchAuthor()} ${escapeMarkdown(await emoji.fetchAuthor().tag)}` }]);
 
         const msg = await emoji.guild.channels.cache.get(guildSettings.logChannel).send({ embeds: [embed] });
 
@@ -55,9 +55,9 @@ async function emojiCreate(emoji) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Created by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Created by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                     msg.edit({ embeds: [embed] });
                 }
             }
@@ -92,9 +92,9 @@ async function emojiUpdate(oldEmoji, newEmoji) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Updated by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                 }
             }
         }
@@ -128,9 +128,9 @@ async function emojiDelete(emoji) {
                 const log = logs.entries.first();
 
                 if (Math.abs(timestamp - log.createdTimestamp) < 1400) {
-                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${log.executor.tag}` }]);
+                    embed.addFields([{ name: "Deleted by", value: `${log.executor} ${escapeMarkdown(log.executor.tag)}` }]);
                     embed.setTimestamp(log.createdAt);
-                    if (log.reason) embed.addFields([{ name: "Reason", value: log.reason }]);
+                    if (log.reason) embed.addFields([{ name: "Reason", value: escapeMarkdown(log.reason) }]);
                 }
             }
         }
