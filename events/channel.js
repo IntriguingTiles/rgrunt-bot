@@ -93,6 +93,11 @@ async function channelUpdate(oldCh, newCh) {
             shouldPost = true;
         }
 
+        if (oldCh.isTextBased() && newCh.isTextBased() && oldCh.rateLimitPerUser !== newCh.rateLimitPerUser) {
+            embed.addFields([{ name: "Slowmode", value: `${oldCh.rateLimitPerUser === 0 ? "None" : `${oldCh.rateLimitPerUser} seconds`} → ${newCh.rateLimitPerUser === 0 ? "None" : `${newCh.rateLimitPerUser} seconds`}`, inline: true }]);
+            shouldPost = true;
+        }
+
         if (!shouldPost) return;
 
         embed.setFooter({ text: `ID: ${newCh.id}` });
