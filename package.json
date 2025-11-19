@@ -20,7 +20,7 @@
     "better-sqlite3": "^9.4.3",
     "bufferutil": "^4.0.2",
     "canvas": "^2.8.0",
-    "discord-api-types": "^0.37.1",
+    "discord-api-types": "^0.38.1",
     "discord.js": "^14.1.2",
     "dotenv": "^8.2.0",
     "enmap": "^5.8.2",
