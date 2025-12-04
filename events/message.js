@@ -106,6 +106,7 @@ async function messageUpdate(oldMsg, newMsg) {
     if (guildSettings.logFlags & flags.logs.EDIT && guildSettings.logChannel && newMsg.guild.channels.cache.has(guildSettings.logChannel) &&
         newMsg.guild.channels.cache.get(guildSettings.logChannel).permissionsFor(newMsg.guild.members.me).has(PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.EmbedLinks) && oldMsg.content !== newMsg.content) {
         if (newMsg.channel.topic && newMsg.channel.topic.includes("[NO-LOGS]")) return;
+        if (oldMsg.partial) return;
         if (newMsg.partial) await newMsg.fetch();
         if (newMsg.author.bot) return;
         const embed = new EmbedBuilder();
@@ -116,11 +117,8 @@ async function messageUpdate(oldMsg, newMsg) {
 
         embed.addFields([{ name: "Author", value: `${newMsg.author} ${escapeMarkdown(newMsg.author.tag)}`, inline: true }]);
         embed.addFields([{ name: "Channel", value: `${newMsg.channel}`, inline: true }]);
-
-        if (!oldMsg.partial) {
-            embed.addFields([{ name: "Before", value: oldMsg.content ? truncate(oldMsg.content, 300, 4) : "None" }]);
-            embed.addFields([{ name: "After", value: newMsg.content ? truncate(newMsg.content, 300, 4) : "None" }]);
-        }
+        embed.addFields([{ name: "Before", value: oldMsg.content ? truncate(oldMsg.content, 300, 4) : "None" }]);
+        embed.addFields([{ name: "After", value: newMsg.content ? truncate(newMsg.content, 300, 4) : "None" }]);
 
         embed.setFooter({ text: `ID: ${newMsg.id}` });
         embed.setTimestamp();
