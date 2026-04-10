@@ -34,7 +34,7 @@ async function messageCreate(msg) {
     if (msg.author.bot) return;
     if (msg.content.length === 0) return;
     if (!msg.deletable) return;
-    if (msg.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
+    if (msg.member?.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
     if (!client.badWords.has(msg.guild.id)) return;
 
     const badWords = client.badWords.get(msg.guild.id);
@@ -57,7 +57,7 @@ async function messageUpdate(oldMsg, newMsg) {
     if (newMsg.author.bot) return;
     if (newMsg.content.length === 0) return;
     if (!newMsg.deletable) return;
-    if (newMsg.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
+    if (newMsg.member?.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
     if (!client.badWords.has(newMsg.guild.id)) return;
 
     const badWords = client.badWords.get(newMsg.guild.id);
