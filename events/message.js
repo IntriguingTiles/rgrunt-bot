@@ -29,6 +29,9 @@ exports.deregister = c => {
  * @param {Message} msg
  */
 async function messageDelete(msg) {
+    if (msg.partial) return;
+    if (msg.author.bot) return;
+
     if (msg.channel.type === ChannelType.DM) return;
 
     const guildSettings = client.guildSettings.get(msg.guild.id);
@@ -42,26 +45,20 @@ async function messageDelete(msg) {
         embed.setAuthor({ name: "Message Deleted", iconURL: msg.guild.iconURL() });
         embed.setColor(colors.ORANGE);
 
-        if (!msg.partial) {
-            if (msg.author.bot) return;
+        embed.setAuthor({ name: "Message Deleted", iconURL: msg.author.displayAvatarURL() });
+        embed.addFields([{ name: "Author", value: `${msg.author} ${escapeMarkdown(msg.author.tag)}`, inline: true }]);
+        embed.addFields([{ name: "Channel", value: `${msg.channel}`, inline: true }]);
 
-            embed.setAuthor({ name: "Message Deleted", iconURL: msg.author.displayAvatarURL() });
-            embed.addFields([{ name: "Author", value: `${msg.author} ${escapeMarkdown(msg.author.tag)}`, inline: true }]);
-            embed.addFields([{ name: "Channel", value: `${msg.channel}`, inline: true }]);
+        if (msg.content.length !== 0) embed.addFields([{ name: "Contents", value: truncate(msg.content, 300, 8) }]);
 
-            if (msg.content.length !== 0) embed.addFields([{ name: "Contents", value: truncate(msg.content, 300, 8) }]);
+        if (msg.attachments.size !== 0) {
+            let attachments = "";
 
-            if (msg.attachments.size !== 0) {
-                let attachments = "";
+            msg.attachments.forEach(attachment => {
+                attachments += `${attachment.proxyURL}\n`;
+            });
 
-                msg.attachments.forEach(attachment => {
-                    attachments += `${attachment.proxyURL}\n`;
-                });
-
-                embed.addFields([{ name: "Attachments", value: attachments }]);
-            }
-        } else {
-            embed.addFields([{ name: "Channel", value: `${msg.channel}`, inline: true }]);
+            embed.addFields([{ name: "Attachments", value: attachments }]);
         }
 
         embed.setFooter({ text: `ID: ${msg.id}` });
