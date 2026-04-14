@@ -16,7 +16,6 @@ const client = new Discord.Client({
         Discord.GatewayIntentBits.GuildPresences,
         Discord.GatewayIntentBits.MessageContent
     ],
-    partials: [Discord.Partials.Message]
 });
 
 client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: true, ensureProps: true });
