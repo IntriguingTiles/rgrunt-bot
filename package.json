@@ -25,6 +25,7 @@
     "dotenv": "^8.2.0",
     "enmap": "^5.8.2",
     "erlpack": "github:discordapp/erlpack",
+    "imghash": "^1.1.3",
     "moment": "^2.29.1",
     "node-fetch": "^2.6.6",
     "numeral": "^2.0.6",
