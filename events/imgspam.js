@@ -36,7 +36,7 @@ const hashes = [
  */
 async function messageCreate(msg) {
     if (msg.guild.id !== "154305477323390976") return;
-    if (msg.attachments.size === 0) return;
+    if (msg.attachments.size !== 4) return;
     if (msg.author.bot) return;
     if (!msg.deletable) return;
     if (msg.member?.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
