@@ -24,10 +24,14 @@ exports.deregister = c => {
 
 const hashes = [
     "f862f1e07c70f03c",
+    "c03fe730227e14f3",
+    "d87860fcbc2a6867",
+    "f1262c3e1e1e0f0f",
     "f078e0ce665a6e38",
+    "80fe38f8f870f0f0",
     "e075e178607e7e30",
     "fe80c0de0f0f1f07",
-    "7f010f0f0f0f0f0f",
+    "7f010f0f0f0f0f0f"
 ];
 
 /**
