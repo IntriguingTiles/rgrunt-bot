@@ -10,12 +10,19 @@ const client = new Discord.Client({
     intents: [
         Discord.GatewayIntentBits.Guilds,
         Discord.GatewayIntentBits.GuildMembers,
-        Discord.GatewayIntentBits.GuildBans,
-        Discord.GatewayIntentBits.GuildEmojisAndStickers,
         Discord.GatewayIntentBits.GuildMessages,
-        Discord.GatewayIntentBits.GuildPresences,
-        Discord.GatewayIntentBits.MessageContent
+        Discord.GatewayIntentBits.GuildModeration,
+        Discord.GatewayIntentBits.GuildExpressions,
+        Discord.GatewayIntentBits.MessageContent,
     ],
+    presence: {
+        activities: [
+            {
+                type: Discord.ActivityType.Watching,
+                name: "always watching"
+            }
+        ]
+    }
 });
 
 client.guildSettings = new Enmap({ name: "guildSettings", autoFetch: true, fetchAll: true, ensureProps: true });
@@ -51,7 +58,6 @@ client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
     client.loadCommands();
     client.loadEvents();
-    client.user.setActivity("with slash commands");
 
     client.guilds.cache.forEach(guild => {
         client.regenWordRegex(guild.id);
