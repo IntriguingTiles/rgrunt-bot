@@ -1,8 +1,9 @@
-const { GuildMember, PermissionsBitField, Message, ChannelType, EmbedBuilder, escapeMarkdown } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { GuildMember, PermissionsBitField, Message, ChannelType, EmbedBuilder, escapeMarkdown, AttachmentBuilder } = require("discord.js"); // eslint-disable-line no-unused-vars
 const imghash = require("imghash");
 const colors = require("../utils/colors");
 const truncate = require("../utils/truncate");
 const fetch = require("node-fetch").default;
+const leven = require("leven").default;
 
 /** @type {import("../types").ClientExt} */
 let client;
@@ -59,8 +60,7 @@ async function messageCreate(msg) {
         if (!res.ok) continue;
         const buf = await res.buffer();
         const hash = await imghash.hash(buf);
-        if (hashes.includes(hash)) {
-            await msg.delete();
+        if (hashes.includes(hash) || hashes.some(v => leven(hash, v) <= 9)) {
             const logCh = msg.guild.channels.cache.get("970048913706987540");
             if (!logCh) return;
             const embed = new EmbedBuilder();
@@ -88,7 +88,8 @@ async function messageCreate(msg) {
             embed.addFields([{ name: "Deleted by", value: `${client.user} ${escapeMarkdown(client.user.tag)}` }]);
             embed.addFields([{ name: "Reason", value: `Image hash match (\`${hash}\`)` }]);
 
-            logCh.send({ embeds: [embed] });
+            await logCh.send({ embeds: [embed], files: [...msg.attachments.values()].map(v => new AttachmentBuilder(v.url)) });
+            msg.delete();
             return;
         }
     }
