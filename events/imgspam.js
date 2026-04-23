@@ -23,19 +23,23 @@ exports.deregister = c => {
 };
 
 const hashes = [
-  "f862f1e07c70f03c",
-  "c03fe730227e14f3",
-  "40fefac0f0e2f078",
-  "d87860fcbc2a6867",
-  "ff001e0f34bc387c",
-  "f1262c3e1e1e0f0f",
-  "f078e0ce665a6e38",
-  "f0f0e0f81e1e7ec0",
-  "80fe38f8f870f0f0",
-  "ff00c1f8f0f0f0f0",
-  "e075e178607e7e30",
-  "fe80c0de0f0f1f07",
-  "7f010f0f0f0f0f0f"
+    "f862f1e07c70f03c",
+    "c03fe730227e14f3",
+    "40fefac0f0e2f078",
+    "d87860fcbc2a6867",
+    "ff001e0f34bc387c",
+    "f1262c3e1e1e0f0f",
+    "f078e0ce665a6e38",
+    "f0f0e0f81e1e7ec0",
+    "80fe38f8f870f0f0",
+    "ff00c1f8f0f0f0f0",
+    "e075e178607e7e30",
+    "fe80c0de0f0f1f07",
+    "7f010f0f0f0f0f0f",
+    "a07e7f2080feb0f8",
+    "407f2a3e00fff0f0",
+    "607e3e1c2c3e7e60",
+    "c17c7c3878f0f0f0"
 ];
 
 /**
