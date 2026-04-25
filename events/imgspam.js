@@ -93,7 +93,7 @@ async function messageCreate(msg) {
             if (hashes.includes(hash)) embed.addFields([{ name: "Reason", value: `Image hash match (\`${hash}\`)` }]);
             else {
                 const mostSimilar = hashes.map(v => {
-                    return { distance: leven(hash, v), hashs: v };
+                    return { distance: leven(hash, v), hash: v };
                 }).filter(v => v.distance <= 9).sort((a, b) => b.distance - a.distance)[0];
                 embed.addFields([{ name: "Reason", value: `Image hash distance below threshold (hash: \`${hash}\`, similar hash: \`${mostSimilar.hash}\`, distance: \`${mostSimilar.distance}\`)` }]);
             }
