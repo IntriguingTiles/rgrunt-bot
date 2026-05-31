@@ -79,6 +79,8 @@ const hashes = [
     "c17c7c3878f0f0f0",
 ];
 
+const maxDistance = 8;
+
 /**
  * 
  * @param {Message} msg 
@@ -97,7 +99,7 @@ async function messageCreate(msg) {
         if (!res.ok) continue;
         const buf = await res.buffer();
         const hash = await imghash.hash(buf);
-        if (hashes.includes(hash) || hashes.some(v => leven(hash, v) <= 9)) {
+        if (hashes.includes(hash) || hashes.some(v => leven(hash, v) <= maxDistance)) {
             const logCh = msg.guild.channels.cache.get("970048913706987540");
             if (!logCh) return;
             const embed = new EmbedBuilder();
@@ -127,7 +129,7 @@ async function messageCreate(msg) {
             else {
                 const mostSimilar = hashes.map(v => {
                     return { distance: leven(hash, v), hash: v };
-                }).filter(v => v.distance <= 9).sort((a, b) => b.distance - a.distance)[0];
+                }).filter(v => v.distance <= maxDistance).sort((a, b) => b.distance - a.distance)[0];
                 embed.addFields([{ name: "Reason", value: `Image ${i + 1} hash distance below threshold (hash: \`${hash}\`, similar hash: \`${mostSimilar.hash}\`, distance: \`${mostSimilar.distance}\`)` }]);
             }
 
