@@ -54,9 +54,9 @@ process.on("unhandledRejection", err => {
 client.on("error", console.error);
 client.on("warn", console.warn);
 
-client.on("ready", () => {
+client.on("ready", async () => {
     console.log(`Logged in as ${client.user.tag}`);
-    client.loadCommands();
+    await client.loadCommands();
     client.loadEvents();
 
     client.guilds.cache.forEach(guild => {
@@ -129,9 +129,10 @@ process.on("message", async msg => {
     }
 });
 
-client.loadCommands = () => {
+client.loadCommands = async () => {
     const commands = fs.readdirSync("./commands/");
     client.commands = {};
+    const cmds = [];
 
     for (let i = 0; i < commands.length; i++) {
         /** @type {import("./types").Command} */
@@ -143,14 +144,15 @@ client.loadCommands = () => {
             if (cmd.commands) {
                 for (let j = 0; j < cmd.commands.length; j++) {
                     client.commands[cmd.commands[j].name] = cmd;
+                    cmds.push(cmd.commands[j].toJSON());
 
-                    if (client.user.id !== "715364254383079455") {
-                        client.guilds.cache.forEach(async guild => {
-                            await client.application.commands.create(cmd.commands[j].toJSON(), guild.id);
-                        });
-                    } else {
-                        client.application.commands.create(cmd.commands[j].toJSON());
-                    }
+                    // if (client.user.id !== "715364254383079455") {
+                    //     client.guilds.cache.forEach(async guild => {
+                    //         await client.application.commands.create(cmd.commands[j].toJSON(), guild.id);
+                    //     });
+                    // } else {
+                    //     client.application.commands.create(cmd.commands[j].toJSON());
+                    // }
                 }
             } else {
                 // eval is the only command without slash command support
@@ -158,6 +160,7 @@ client.loadCommands = () => {
             }
         }
     }
+    await client.application.commands.set(cmds);
     console.log(`Loaded ${commands.length} commands!`);
 };
 
