@@ -1,4 +1,4 @@
-const { GuildMember, PermissionsBitField, Message, ChannelType, EmbedBuilder, escapeMarkdown, AttachmentBuilder } = require("discord.js"); // eslint-disable-line no-unused-vars
+const { GuildMember, PermissionsBitField, Message, ChannelType, EmbedBuilder, escapeMarkdown, AttachmentBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Interaction } = require("discord.js"); // eslint-disable-line no-unused-vars
 const imghash = require("imghash");
 const colors = require("../utils/colors");
 const truncate = require("../utils/truncate");
@@ -14,6 +14,7 @@ let client;
 exports.register = c => {
     client = c;
     c.on("messageCreate", messageCreate);
+    c.on("interactionCreate", interactionCreate);
 };
 
 /**
@@ -21,6 +22,7 @@ exports.register = c => {
  */
 exports.deregister = c => {
     c.removeListener("messageCreate", messageCreate);
+    c.removeListener("interactionCreate", interactionCreate);
 };
 
 const hashes = [
@@ -28,19 +30,25 @@ const hashes = [
     "f862f1e07478c07e",
     "c11f7f1040fe1f1c",
     "f4267e303e383e38",
+    "40fefe40f0f0f078",
+    "063fbf20b0d93c3c",
+    "f46178787e303f22",
+    "f46178787e303e32",
     "c03fe730227e14f3",
     "40fefac0f0e2f078",
     "40fefe4030fcf870",
     "40fefe4020fef870",
     "1c3eb39180fdd8d8",
     "f862707c7e303e70",
-    "40fefe40f0f0f078",
     "00fffe4080fe70f8",
     "d87860fcbc2a6867",
     "b0f8c0eece626a2e",
     "00ffd2d1d4d4c707",
     "7cb0fc84f0e4707c",
     "f8e040f77f40614f",
+    "1f687c64741d9f18",
+    "f8b0e0aee3686b2c",
+    "f8b0e0cee3686b2c",
     "ff001e0f34bc387c",
     "77031f07270f3c3c",
     "3f0c3cacf0e4387c",
@@ -54,6 +62,9 @@ const hashes = [
     "00ffe0ec381f1f07",
     "40fe027f1f13ff00",
     "ff00c8f83c3cfcc0",
+    "ff00033f1f1cfd40",
+    "18bd1d0f0f4ee1e1",
+    "ff00689d0f0f1f0e",
     "f0f0e0f81e1e7ec0",
     "f0f020fe3e1cfe80",
     "f0f020fe3e2cfe80",
@@ -65,6 +76,8 @@ const hashes = [
     "7f010f0f0f0f0f0f",
     "ff00c1f878f0f0e1",
     "f08ef0f072f0d592",
+    "243f1e1e3f051d47",
+    "ff00689d1e0f1f0e",
     "ff00c1f8f0f0f0f0",
     "ff00c2f878f0f0f0",
     "ff0043f878f0f0f0",
@@ -133,9 +146,36 @@ async function messageCreate(msg) {
                 embed.addFields([{ name: "Reason", value: `Image ${i + 1} hash distance below threshold (hash: \`${hash}\`, similar hash: \`${mostSimilar.hash}\`, distance: \`${mostSimilar.distance}\`)` }]);
             }
 
-            await logCh.send({ embeds: [embed], files: [...msg.attachments.values()].map(v => new AttachmentBuilder(v.url)) });
+            const row = new ActionRowBuilder().addComponents([
+                new ButtonBuilder()
+                    .setLabel("Kick")
+                    .setStyle(ButtonStyle.Danger)
+                    .setCustomId(`kick_${msg.author.id}`)
+            ]);
+
+            await logCh.send({ embeds: [embed], files: [...msg.attachments.values()].map(v => new AttachmentBuilder(v.url)), components: [row.toJSON()] });
             msg.delete();
             return;
+        }
+    }
+}
+
+/**
+ * 
+ * @param {Interaction} intr 
+ * @returns 
+ */
+async function interactionCreate(intr) {
+    if (intr.guild.id !== "154305477323390976" || !intr.isButton()) return;
+
+    if (intr.customId.startsWith("kick_")) {
+        const target = intr.customId.replace("kick_");
+        await intr.deferReply();
+        try {
+            await intr.guild.members.kick(target, `Scam (kicked by ${intr.user.username} (${intr.user.id}))`);
+            return intr.followUp({ content: `Kicked <@${target}>.` });
+        } catch {
+            return intr.followUp({ content: `Failed to kick <@${target}>.` });
         }
     }
 }
