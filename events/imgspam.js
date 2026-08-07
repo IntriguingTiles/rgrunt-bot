@@ -169,7 +169,7 @@ async function interactionCreate(intr) {
     if (intr.guild.id !== "154305477323390976" || !intr.isButton()) return;
 
     if (intr.customId.startsWith("kick_")) {
-        const target = intr.customId.replace("kick_");
+        const target = intr.customId.replace("kick_", "");
         await intr.deferReply();
         try {
             await intr.guild.members.kick(target, `Scam (kicked by ${intr.user.username} (${intr.user.id}))`);
