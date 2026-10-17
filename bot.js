@@ -46,6 +46,8 @@ const defaultSettings = {
     warns: []
 };
 
+let prefixMention;
+
 process.on("unhandledRejection", err => {
     console.error(`Unhandled promise rejection!\n${err.stack}`);
     if (client.readyTimestamp && client.user.id === "715364254383079455") client.users.cache.get("221017760111656961").send(err.stack);
@@ -63,6 +65,7 @@ client.on("ready", async () => {
         client.regenWordRegex(guild.id);
         client.regenNameRegex(guild.id);
     });
+    prefixMention = new RegExp(`^<@!?${client.user.id}> `);
 });
 
 client.on("guildCreate", async guild => {
@@ -76,16 +79,13 @@ client.on("guildDelete", async guild => {
 client.on("messageCreate", async msg => {
     if (msg.partial) return;
     if (msg.author.bot) return;
-    if (!msg.content.startsWith("!")) return;
 
-    const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
-    const cmd = msg.content.slice(1).split(" ")[0];
-
-    if (!(cmd in client.commands)) return;
-
-    if (cmd === "eval") {
-        const args = msg.content.split(" ").slice(1);
-        client.commands[cmd].run(client, msg, args, guildSettings);
+    if (prefixMention.test(msg.content)) {
+        if (msg.content.split(" ")[1] === "eval" && msg.author.id === "221017760111656961") {
+            const guildSettings = client.guildSettings.ensure(msg.guild.id, defaultSettings);
+            const args = msg.content.split(" ").slice(2);
+            client.commands["eval"].run(client, msg, args, guildSettings);
+        }
     }
 });
 
