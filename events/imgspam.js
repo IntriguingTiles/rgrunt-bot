@@ -104,6 +104,7 @@ async function messageCreate(msg) {
     if (msg.author.bot) return;
     if (!msg.deletable) return;
     if (msg.member?.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
+    if (msg.channel.isThread() && msg.channel.parent?.type === ChannelType.GuildForum) return;
 
     for (let i = 0; i < msg.attachments.size; i++) {
         const attach = msg.attachments.at(i);
