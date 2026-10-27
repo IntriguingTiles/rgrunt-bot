@@ -125,7 +125,7 @@ const hashes = [
     "c17c7c3878f0f0f0",
 ];
 
-const maxDistance = 8;
+const maxDistance = 7;
 
 /**
  * 
