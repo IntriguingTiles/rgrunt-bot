@@ -54,6 +54,7 @@ const hashes = [
     "f862f1e07e603ee0",
     "38f8c0eee6626a2e",
     "f868e370c07e70f8",
+    "00ff7f20e07a3c0f",
     "c03fe730227e14f3",
     "40fefac0f0e2f078",
     "40fefe4030fcf870",
@@ -76,6 +77,7 @@ const hashes = [
     "38f8c0eece626a2e",
     "00ffec2c283f1f0e",
     "f862e1e17e603ee0",
+    "0cfceec0c8f850fc",
     "ff001e0f34bc387c",
     "77031f07270f3c3c",
     "3f0c3cacf0e4387c",
@@ -119,6 +121,8 @@ const hashes = [
     "876c787878f0f0f0",
     "e075e178607e7e30",
     "fe80c0de0f0f1f07",
+    "60fc3c3c7878fc03",
+    "40fefac0f0e27878",
     "a07e7f2080feb0f8",
     "407f2a3e00fff0f0",
     "607e3e1c2c3e7e60",
@@ -133,11 +137,12 @@ const maxDistance = 7;
  */
 async function messageCreate(msg) {
     if (msg.guild.id !== "154305477323390976") return;
-    if (msg.attachments.size !== 4) return;
+    if (msg.attachments.size < 2) return;
     if (msg.author.bot) return;
     if (!msg.deletable) return;
     if (msg.member?.permissions.has(PermissionsBitField.Flags.ManageGuild)) return;
     if (msg.channel.isThread() && msg.channel.parent?.type === ChannelType.GuildForum) return;
+    const strictMatch = msg.attachments !== 4;
 
     for (let i = 0; i < msg.attachments.size; i++) {
         const attach = msg.attachments.at(i);
@@ -146,7 +151,8 @@ async function messageCreate(msg) {
         if (!res.ok) continue;
         const buf = await res.buffer();
         const hash = await imghash.hash(buf);
-        if (hashes.includes(hash) || hashes.some(v => leven(hash, v) <= maxDistance)) {
+
+        if (hashes.includes(hash) || (!strictMatch && hashes.some(v => leven(hash, v) <= maxDistance))) {
             const logCh = msg.guild.channels.cache.get("970048913706987540");
             if (!logCh) return;
             const embed = new EmbedBuilder();
